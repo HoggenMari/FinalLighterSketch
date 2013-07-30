@@ -1,0 +1,13 @@
+package Kinect;
+import SimpleOpenNI.SimpleOpenNI;
+
+
+public class InitSkeleton implements InitStrategy {
+
+	@Override
+	public void init(SimpleOpenNI context) {
+		context.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
+		
+	}
+
+}

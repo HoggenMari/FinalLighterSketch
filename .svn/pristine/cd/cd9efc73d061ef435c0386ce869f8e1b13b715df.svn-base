@@ -1,0 +1,63 @@
+import processing.core.PApplet;
+import processing.core.PImage;
+import SimpleOpenNI.SimpleOpenNI;
+
+public class Kinect {
+	SimpleOpenNI context;
+	PImage input;
+	PImage output;
+	int kin_img1[];
+	boolean autoCalib = true;
+	PApplet p;
+
+	public Kinect(int mode, SimpleOpenNI context, PApplet p) {
+		this.p = p;
+		this.context = context;
+		switch (mode) {
+		case 0:
+			context.enableScene();
+			break;
+		case 1:
+			context.enableDepth();
+			context.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
+
+			// p.background(200,0,0);
+
+			// p.stroke(0,0,255);
+			// p.strokeWeight(3);
+			p.smooth();
+
+			// p.size(context.depthWidth(), context.depthHeight());
+			break;
+		default:
+			System.out.println("Mode nicht verfügbar");
+		}
+	}
+
+	public PImage drawScene() {
+
+		context.update();
+		input = context.sceneImage();
+		output = new PImage(640, 480);
+
+		// Resize Bug Solve
+		kin_img1 = new int[640 * 480];
+		for (int ix = 0; ix < 640; ix++) {
+			for (int iy = 0; iy < 480; iy++) {
+				kin_img1[(ix * 480) + iy] = input.get(ix, iy);
+
+			}
+		}
+
+		for (int ix = 0; ix < 640; ix++) {
+			for (int iy = 0; iy < 480; iy++) {
+				output.set(640 - ix, iy, kin_img1[(ix * 480) + iy]);
+			}
+		}
+
+		output.resize(24, 24);
+
+		return output;
+	}
+  
+}

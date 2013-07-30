@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="/Users/mariushoggenmuller/Documents/Processing/sketch_130614a/application.linux64/lib/core.jar"/>
+	<classpathentry kind="lib" path="/Users/mariushoggenmuller/Documents/Processing/sketch_130614a/application.linux64/lib/udp.jar"/>
+	<classpathentry kind="lib" path="/Users/mariushoggenmuller/Documents/Processing/libraries/controlP5/library/controlP5.jar"/>
+	<classpathentry kind="lib" path="/Users/mariushoggenmuller/Documents/Processing/libraries/SimpleOpenNi/library/SimpleOpenNI.jar"/>
+	<classpathentry kind="lib" path="/Users/mariushoggenmuller/Downloads/RXTXcomm.jar"/>
+	<classpathentry kind="lib" path="/Users/mariushoggenmuller/Downloads/arduino 2/library/Arduino.jar"/>
+	<classpathentry kind="lib" path="/Users/mariushoggenmuller/Dropbox/Uni/SoSe2013/Bachelor-Arbeit/serial/library/serial.jar"/>
+	<classpathentry kind="lib" path="/Users/mariushoggenmuller/Dropbox/Uni/SoSe2013/Bachelor-Arbeit/serial/library/RXTXcomm.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

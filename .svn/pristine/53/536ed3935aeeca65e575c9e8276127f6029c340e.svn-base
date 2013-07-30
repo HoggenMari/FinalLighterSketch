@@ -1,0 +1,78 @@
+package Kinect;
+import processing.core.PApplet;
+import processing.core.PGraphics;
+import processing.core.PImage;
+import processing.core.PVector;
+import SimpleOpenNI.SimpleOpenNI;
+
+
+public class DrawSkeleton implements DrawStrategy{
+	
+	private PGraphics pg;
+	
+	public DrawSkeleton(PApplet p) {
+		super();
+		this.pg = p.createGraphics(640, 480);
+	}
+	
+
+	@Override
+	public PImage draw(SimpleOpenNI context) {
+		// update the cam
+		context.update();
+		
+		// draw the skeleton if it's available
+		int[] userList = context.getUsers();
+		for (int i = 0; i < userList.length; i++) {
+			if (context.isTrackingSkeleton(userList[i]))
+				// System.out.println(context.isTrackingSkeleton(userList[i]));
+
+				pg = drawSkeleton(userList[i], context);
+			PVector jointPos = new PVector();
+			context.getJointPositionSkeleton(userList[i],
+					SimpleOpenNI.SKEL_NECK, jointPos);
+			// println(jointPos);
+		}
+		PImage img = pg.get(0, 0, pg.width, pg.height);
+		return img;
+		
+		
+	}
+	
+	// draw the skeleton with the selected joints
+	public PGraphics drawSkeleton(int userId, SimpleOpenNI context) {
+		// size(500, 500);
+
+		// to get the 3d joint data
+		PVector jointPos = new PVector();
+		context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_RIGHT_HAND,
+				jointPos);
+		System.out.println("USER: "+userId+" "+jointPos);
+
+		// convert real world point to projective space
+		PVector jointPos_Proj = new PVector();
+		context.convertRealWorldToProjective(jointPos, jointPos_Proj);
+
+		// a 200 pixel diameter head
+		float headsize = 10;
+
+		// set the fill colour to make the circle green
+		pg.fill(0, 255, 0);
+
+		// draw the circle at the position of the head with the specified head
+		// size
+		// ellipse(jointPos_Proj.x,jointPos_Proj.y, headsize,headsize);
+		pg.beginDraw();
+		pg.fill(0, 255, 0);
+		pg.stroke(0, 0, 0);
+		pg.clear();
+		pg.ellipse((jointPos_Proj.x), (jointPos_Proj.y), headsize,
+				headsize);
+		pg.endDraw();
+		
+
+		return pg;
+
+	}
+
+}

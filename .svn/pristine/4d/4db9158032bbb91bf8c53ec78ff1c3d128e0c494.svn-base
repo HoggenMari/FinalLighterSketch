@@ -1,0 +1,8 @@
+package Kinect;
+import SimpleOpenNI.SimpleOpenNI;
+
+
+public interface InitStrategy {
+	public void init(SimpleOpenNI context);
+
+}

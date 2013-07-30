@@ -1,0 +1,14 @@
+package Kinect;
+import processing.core.PImage;
+import SimpleOpenNI.SimpleOpenNI;
+
+
+public abstract class Kinect {
+	public EnableStrategy enableStrategy;
+	public DrawStrategy drawStrategy;
+	public InitStrategy initStrategy;
+	public abstract SimpleOpenNI enable();
+	public abstract PImage draw(SimpleOpenNI context);
+	public abstract void init(SimpleOpenNI context);
+
+}
