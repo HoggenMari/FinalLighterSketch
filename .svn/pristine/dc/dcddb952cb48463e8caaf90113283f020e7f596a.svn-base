@@ -1,7 +1,0 @@
-package Kinect;
-import SimpleOpenNI.SimpleOpenNI;
-import processing.core.PApplet;
-
-public interface EnableStrategy {
-	public SimpleOpenNI enable(PApplet p);
-}

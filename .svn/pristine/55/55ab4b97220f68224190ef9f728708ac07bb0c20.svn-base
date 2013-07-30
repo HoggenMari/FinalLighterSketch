@@ -1,8 +1,0 @@
-package Kinect;
-import SimpleOpenNI.SimpleOpenNI;
-import processing.core.PImage;
-
-
-public interface DrawStrategy {
-	public PImage draw(SimpleOpenNI context);
-}
