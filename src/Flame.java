@@ -2,37 +2,37 @@ import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PGraphics;
 
-public class ColorPoint
+public class Flame
 {
  
  PApplet p;
- float posX;
- float posY;
- int user; 
+ int posX;
+ int posY;
+ int lighter; 
   
-  public ColorPoint(PApplet p, int user)
+  public Flame(PApplet p, int lighter)
   {
     this.p = p;
-    this.user = user;
+    this.lighter = lighter;
   }
 
 
-public boolean equals(int userId) {
-	if (user == userId) {
+public boolean equals(int lighterID) {
+	if (lighter == lighterID) {
 		return true;
 	} else return false;
 }
 
-public void setPoint(float posX, float posY)
+public void setFlame(int posX, int posY)
   {
     this.posX = posX;
     this.posY = posY;
   }
   
   public void draw(PGraphics pg) {
-	pg.colorMode(PConstants.HSB);
+	pg.colorMode(PConstants.RGB);
     pg.beginDraw();
-    pg.stroke( p.frameCount % 256, 255, 255);
+    pg.stroke( 255, 80, 80);
     pg.strokeWeight(100);
     pg.line(posX, posY, posX, posY);
     pg.endDraw();
