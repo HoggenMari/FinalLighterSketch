@@ -1,8 +1,10 @@
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.core.PImage;
+import processing.core.PVector;
 import processing.serial.*;
 
 public class ProcessingMain extends PApplet {
@@ -18,13 +20,12 @@ public class ProcessingMain extends PApplet {
 	private LEDScreen ledScreen1;
 	private LEDWall ledWall;
 	private ArrayList<Lighter> lighterList;
-	private ArrayList<Flame> flameList;
 	private PGraphics pg;
-	private PImage FlameImg;
+	private ArrayList<Firework> firework;
 
 	public void setup() {
 		
-		pg = createGraphics(1024, 1024);
+		pg = createGraphics(400, 400);
 
 
 		// LEDScreen1 initialisieren
@@ -42,7 +43,7 @@ public class ProcessingMain extends PApplet {
 		}
 		
 		//FlameList initialisiren
-		flameList = new ArrayList<Flame>();
+		firework = new ArrayList<Firework>();
 
 		lighterList.get(0).toString();
 
@@ -63,31 +64,41 @@ public class ProcessingMain extends PApplet {
 	public void draw() {
 
 		background(0);
+
 		
-		drawFlame();
+		PImage img1 = drawFirework();
+		image(img1,0,0);
+		
+		img1.resize(24, 24);
+		ledScreen1.update(img1);
+		ledScreen1.drawOnGui(170, 5);
+		ledWall.sendDMX();
+
+
+		
+	}
+	
+	public PImage drawFirework() {
+
+		for (Iterator<Firework> fireItr = firework.iterator(); fireItr
+				.hasNext();) {
+			Firework fw = fireItr.next();
+			if (fw.isDead()) {
+				fireItr.remove();
+			} else
+				fw.draw(pg);
+		}
+
+		PImage img = pg.get();
+		return img;
+	}
+	
+	public void mousePressed() {
+
+		firework.add(new Firework(this, new PVector(mouseX, mouseY)));
 
 	}
 	
-	public PImage drawFlame() {
-		
-		for(Lighter li : lighterList) {
-			//if(li.isActive()) {
-				Flame flame = new Flame(this, lighterList.indexOf(li));
-				flame.setFlame(li.getPosX(), li.getPosY());
-				flameList.add(flame);
-			//}
-		}
-		
-		for (Flame fl : flameList) {
-			fl.draw(pg);
-		}
-		blur(20, pg);
-		FlameImg = pg.get();
-		//FlameImg.resize(160, 120);
-		image(FlameImg, 0, 0);		
-		
-		return FlameImg;
-	}
 
 	public void serialEvent(Serial myPort) {
 		myString = myPort.readStringUntil(lf);
