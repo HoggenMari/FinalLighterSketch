@@ -1,32 +1,67 @@
-import java.util.Observable;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import processing.core.PVector;
 
 
 public class Lighter {
 	
 	private int lighterID;
-	private int posX, posY;
-	private boolean active;
+	private boolean active, init;
+	static int MAX_X = 1023;
+	static int MAX_Y = 1023;
+
+	private PVector pos, ppos;
+	private BlockingQueue<PVector> pos_queue;
+	private PVector size;
 
 
-	public Lighter(int lighterID){
+	public Lighter(int lighterID, PVector size){
 		this.lighterID = lighterID;
+		this.pos = new PVector(1023,1023);
 		this.active = false;
+		this.init = false;
+		this.pos_queue = new LinkedBlockingQueue<PVector>(10);
+		this.size = size;
+
 	}
 	
-	public void setPosition(int posX, int posY){
-		this.posX = posX;
-		this.posY = posY;
-		if(posX==1023 && posY==1023){
+	public void setPosition(PVector pos){
+		ppos = this.pos;
+		if(pos_queue.remainingCapacity()==0){
+			pos_queue.remove();
+			pos_queue.add(pos);
+		}
+		//Save previous Position
+		//New position
+		pos.x = (pos.x/MAX_X)*size.x;
+		pos.y = (pos.y/MAX_Y)*size.y;
+		this.pos = pos;
+		
+		//check status
+		/*if(pos.x==1023 && pos.y==1023){
 			active = false;
 		}else {
+			while( !pos_queue.isEmpty()){
+				if(pos_queue.element().x==1023 && pos_queue.element().y==1023){
+					init = true;
+				}
+			}
 			active = true;
-		}
+		}*/
+		//System.out.println(ppos.toString());
+		//System.out.println(pos.toString());
+		if(ppos.x == size.x && ppos.y == size.y && pos.x != size.x && pos.y != size.y) {
+			init = true;
+			System.out.println("FLANKENWECHSEL");
+		} else init = false;
 	}
+	
 	
 	@Override
 	public String toString() {
-		return "Lighter [lighterID=" + lighterID + ", posX=" + posX + ", posY="
-				+ posY + "]";
+		return "Lighter [lighterID=" + lighterID + ", posX=" + pos.x + ", posY="
+				+ pos.y + "]";
 	}
 
 	public boolean isActive() {
@@ -37,21 +72,29 @@ public class Lighter {
 		this.active = active;
 	}
 
-	public int getPosX() {
-		return posX;
+	public PVector getPos() {
+		return pos;
 	}
 
-	public void setPosX(int posX) {
-		this.posX = posX;
+	public void setPos(PVector pos) {
+		this.pos = pos;
 	}
 
-	public int getPosY() {
-		return posY;
+	public PVector getPpos() {
+		return ppos;
 	}
 
-	public void setPosY(int posY) {
-		this.posY = posY;
+	public void setPpos(PVector ppos) {
+		this.ppos = ppos;
 	}
-	
+
+	public boolean isInit() {
+		return init;
+	}
+
+	public void setInit(boolean init) {
+		this.init = init;
+	}
+
 
 }

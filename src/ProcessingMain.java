@@ -1,8 +1,5 @@
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Vector;
 
 import processing.core.PApplet;
 import processing.core.PGraphics;
@@ -25,7 +22,6 @@ public class ProcessingMain extends PApplet {
 	private ArrayList<Lighter> lighterList;
 	private PGraphics pg;
 	private ArrayList<Firework> firework;
-	private Firework fireworkItem;
 
 	public void setup() {
 		
@@ -43,7 +39,7 @@ public class ProcessingMain extends PApplet {
 		// LighterList initialisieren
 		lighterList = new ArrayList<Lighter>();
 		for (int i = 0; i < 4; i++) {
-			lighterList.add(new Lighter(i));
+			lighterList.add(new Lighter(i, new PVector(pg.width, pg.height)));
 		}
 		
 		//FlameList initialisiren
@@ -59,7 +55,7 @@ public class ProcessingMain extends PApplet {
 		myPort.clear();
 		num = new int[10];
 
-		size(1024, 1024);
+		size(400, 400);
 
 		background(0, 0, 0);
 
@@ -69,10 +65,13 @@ public class ProcessingMain extends PApplet {
 
 		background(0);
 
+		
 		for(Lighter lg : lighterList) {
-			if(lg.isActive()){
-				firework.add(new Firework(this, new PVector(lg.getPosX(), lg.getPosY())));
-				lg.setActive(false);
+			System.out.println(lg.toString());
+			if(lg.isInit()){
+				firework.add(new Firework(this, lg.getPos()));
+				System.out.println(lg.toString()+"INIT");
+				lg.setInit(false);
 			}
 		}
 		
@@ -84,7 +83,7 @@ public class ProcessingMain extends PApplet {
 		ledScreen1.drawOnGui(170, 5);
 		ledWall.sendDMX();
 
-
+		System.out.println(firework.size());
 		
 	}
 	
@@ -121,9 +120,9 @@ public class ProcessingMain extends PApplet {
 				if (spl2.length >= 2) {
 					int posX = parseWithDefault(spl2[0], 0);
 					int posY = parseWithDefault(spl2[1], 0);
-					lighterList.get(i).setPosition(posX, posY);
+					lighterList.get(i).setPosition(new PVector(posX, posY));
 				}
-				System.out.println(lighterList.get(i).toString());
+				//System.out.println(lighterList.get(i).toString());
 				// float num = float(list[i]);
 				// num[i]=Integer.parseInt(list[i]); // Converts and prints
 				// float
