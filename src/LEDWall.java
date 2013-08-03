@@ -92,7 +92,7 @@ public class LEDWall {
 						dataIndex += 3;
 						ledCounter++;
 
-						System.out.println("LEDCOUNTER: DOWN"+ledCounter);
+						//System.out.println("LEDCOUNTER: DOWN"+ledCounter);
 
 						
 						if (ledCounter >= ledsOnPort) {
@@ -115,7 +115,7 @@ public class LEDWall {
 						dataIndex += 3;
 						ledCounter++;
 
-						System.out.println("LEDCOUNTER UP:"+ledCounter);
+						//System.out.println("LEDCOUNTER UP:"+ledCounter);
 						
 							
 						if (ledCounter >= ledsOnPort) {

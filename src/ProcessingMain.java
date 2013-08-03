@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Vector;
 
 import processing.core.PApplet;
 import processing.core.PGraphics;
@@ -22,6 +25,7 @@ public class ProcessingMain extends PApplet {
 	private ArrayList<Lighter> lighterList;
 	private PGraphics pg;
 	private ArrayList<Firework> firework;
+	private Firework fireworkItem;
 
 	public void setup() {
 		
@@ -65,11 +69,17 @@ public class ProcessingMain extends PApplet {
 
 		background(0);
 
+		for(Lighter lg : lighterList) {
+			if(lg.isActive()){
+				firework.add(new Firework(this, new PVector(lg.getPosX(), lg.getPosY())));
+				lg.setActive(false);
+			}
+		}
 		
 		PImage img1 = drawFirework();
 		image(img1,0,0);
 		
-		img1.resize(24, 24);
+		img1.resize(8, 24);
 		ledScreen1.update(img1);
 		ledScreen1.drawOnGui(170, 5);
 		ledWall.sendDMX();
