@@ -23,8 +23,11 @@ public class Firework {
 
 	private PApplet p;
 
-	public Firework(PApplet p, PVector pos, Color c){
+	private int id;
+
+	public Firework(PApplet p, PVector pos, Color c, int id){
 		this.p = p;
+		this.id = id;
 				   
 		   hanabi = new ArrayList<Fire>();
 		   
@@ -78,5 +81,11 @@ public class Firework {
 		} 
 		return true;
 	}
+
+
+	public int getId() {
+		return id;
+	}
+	
 
 }

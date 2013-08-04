@@ -25,10 +25,9 @@ public class ProcessingMain extends PApplet {
 	private ArrayList<Firework> firework;
 
 	public void setup() {
-		
+
 		pg = createGraphics(200, 400);
 		pg.colorMode(HSB);
-
 
 		// LEDScreen1 initialisieren
 		ledScreen1 = new LEDScreen(10, 24, this);
@@ -43,8 +42,8 @@ public class ProcessingMain extends PApplet {
 		for (int i = 0; i < 4; i++) {
 			lighterList.add(new Lighter(i, new PVector(pg.width, pg.height)));
 		}
-		
-		//FlameList initialisiren
+
+		// FlameList initialisiren
 		firework = new ArrayList<Firework>();
 
 		lighterList.get(0).toString();
@@ -66,29 +65,46 @@ public class ProcessingMain extends PApplet {
 	public void draw() {
 
 		background(0);
-
 		
-		for(Lighter lg : lighterList) {
+		boolean fwWithID=false;
+
+		for (Lighter lg : lighterList) {
 			System.out.println(lg.toString());
-			if(lg.isInit()){
-				firework.add(new Firework(this, lg.getPos(), new Color((int)random(0,255), 255, 255)));
-				System.out.println(lg.toString()+"INIT");
+			if (lg.isInit()) {
+				firework.add(new Firework(this, lg.getPos(), new Color(
+						(int) random(0, 255), 255, 255), lg.getLighterID()));
+				System.out.println(lg.toString() + "INIT");
 				lg.setInit(false);
 			}
+			if (lg.isActive()) {
+				for(Firework fw : firework) {
+					if(fw.getId()==lg.getLighterID()){
+						fwWithID=true;
+					}
+				}
+				if(!fwWithID){
+					firework.add(new Firework(this, lg.getInitPos(), new Color(
+					(int) random(0, 255), 255, 255), lg.getLighterID()));
+					System.out.println(lg.toString() + "REACTIVATED");
+				}
+			}
 		}
-		
+
 		PImage img1 = drawFirework();
-		image(img1,0,0);
-		
+		image(img1, 0, 0);
+
 		img1.resize(10, 24);
 		ledScreen1.update(img1);
 		ledScreen1.drawOnGui(170, 5);
 		ledWall.sendDMX();
 
-		System.out.println(firework.size());
-		
+		for(Firework fw :firework) {
+			System.out.println(fw.getId());
+		}
+		//System.out.println(firework.size());
+
 	}
-	
+
 	public PImage drawFirework() {
 
 		for (Iterator<Firework> fireItr = firework.iterator(); fireItr
@@ -103,13 +119,13 @@ public class ProcessingMain extends PApplet {
 		PImage img = pg.get();
 		return img;
 	}
-	
+
 	public void mousePressed() {
 
-		firework.add(new Firework(this, new PVector(mouseX, mouseY), new Color((int)random(0,255), 255, 255)));
+		firework.add(new Firework(this, new PVector(mouseX, mouseY), new Color(
+				(int) random(0, 255), 255, 255), 100));
 
 	}
-	
 
 	public void serialEvent(Serial myPort) {
 		myString = myPort.readStringUntil(lf);
@@ -124,7 +140,7 @@ public class ProcessingMain extends PApplet {
 					int posY = parseWithDefault(spl2[1], 0);
 					lighterList.get(i).setPosition(new PVector(posX, posY));
 				}
-				//System.out.println(lighterList.get(i).toString());
+				// System.out.println(lighterList.get(i).toString());
 				// float num = float(list[i]);
 				// num[i]=Integer.parseInt(list[i]); // Converts and prints
 				// float
@@ -140,7 +156,7 @@ public class ProcessingMain extends PApplet {
 			return defaultVal;
 		}
 	}
-	
+
 	void blur(float trans, PGraphics pg) {
 		pg.noStroke();
 		pg.fill(0, trans);

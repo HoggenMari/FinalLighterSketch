@@ -7,11 +7,12 @@ import processing.core.PVector;
 public class Lighter {
 	
 	private int lighterID;
+
 	private boolean active, init;
 	static int MAX_X = 1023;
 	static int MAX_Y = 1023;
 
-	private PVector pos, ppos;
+	private PVector pos, ppos, initPos;
 	private BlockingQueue<PVector> pos_queue;
 	private PVector size;
 
@@ -52,9 +53,18 @@ public class Lighter {
 		//System.out.println(ppos.toString());
 		//System.out.println(pos.toString());
 		if(ppos.x == size.x && ppos.y == size.y && pos.x != size.x && pos.y != size.y) {
+			initPos = pos;
 			init = true;
 			System.out.println("FLANKENWECHSEL");
-		} else init = false;
+		}
+		else if(ppos.x != size.x && ppos.y != size.y && pos.x != size.x && pos.y != size.y) {
+			init = false;
+			active = true;
+			System.out.println("AKTIV");
+		} else {
+			init = false;
+			active = false;
+		}
 	}
 	
 	
@@ -95,6 +105,15 @@ public class Lighter {
 	public void setInit(boolean init) {
 		this.init = init;
 	}
+	
+	public int getLighterID() {
+		return lighterID;
+	}
+
+	public PVector getInitPos() {
+		return initPos;
+	}
+
 
 
 }
