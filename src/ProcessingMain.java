@@ -56,7 +56,7 @@ public class ProcessingMain extends PApplet {
 		myPort.clear();
 		num = new int[10];
 
-		size(400, 400);
+		size(200, 400);
 
 		background(0, 0, 0);
 
