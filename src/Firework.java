@@ -15,7 +15,7 @@ public class Firework {
 	 * re-upload
 	 */
 
-	ArrayList<Fire> hanabi;
+	ArrayList<FireworkParticle> hanabi;
 
 	final int FIRE_COUNT = 1000;
 	final float X = 200;
@@ -40,13 +40,13 @@ public class Firework {
 		
 		lifetime = p.random(100, 500);
 
-		hanabi = new ArrayList<Fire>();
+		hanabi = new ArrayList<FireworkParticle>();
 
 		for (int i = 0; i < FIRE_COUNT; i++) {
 			float r = p.random(0, PConstants.TWO_PI);
 			float R = p.random(0, 2);
 
-			hanabi.add(new Fire(pos.x, pos.y, R * PApplet.sin(r), R
+			hanabi.add(new FireworkParticle(pos.x, pos.y, R * PApplet.sin(r), R
 					* PApplet.cos(r), c, lifetime));
 		}
 
@@ -71,7 +71,7 @@ public class Firework {
 			pg.popMatrix();
 		} else {
 			//paint "flower"
-			for (Fire fire : hanabi) {
+			for (FireworkParticle fire : hanabi) {
 				fire.draw(pg);
 			}
 		}
@@ -83,7 +83,7 @@ public class Firework {
 	}
 
 	public boolean isDead() {
-		for (Fire fire : hanabi) {
+		for (FireworkParticle fire : hanabi) {
 			if (fire.lifetime - 50 > 0) {
 				return false;
 			}

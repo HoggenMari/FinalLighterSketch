@@ -23,6 +23,7 @@ public class ProcessingMain extends PApplet {
 	private ArrayList<Lighter> lighterList;
 	private PGraphics pg;
 	private ArrayList<Firework> firework;
+	private ArrayList<Flame> flames;
 
 	public void setup() {
 
@@ -43,18 +44,20 @@ public class ProcessingMain extends PApplet {
 			lighterList.add(new Lighter(i, new PVector(pg.width, pg.height)));
 		}
 
-		// FlameList initialisiren
+		// Firework initialisiren
 		firework = new ArrayList<Firework>();
+		
+		// Fire initialisieren
+		flames = new ArrayList<Flame>();
 
 		lighterList.get(0).toString();
 
-		frameRate(100);
-		for (int i = 0; i < Serial.list().length; i++) {
+		/*for (int i = 0; i < Serial.list().length; i++) {
 			System.out.println("Device " + i + " " + Serial.list()[i]);
 		}
 		myPort = new Serial(this, Serial.list()[4], 9600);
 		myPort.clear();
-		num = new int[10];
+		num = new int[10];*/
 
 		size(200, 400);
 
@@ -90,7 +93,13 @@ public class ProcessingMain extends PApplet {
 			}
 		}
 
-		PImage img1 = drawFirework();
+		//Flame verfolgen
+		for(Flame fl : flames) {
+			fl.update(new PVector(mouseX, mouseY));
+		}
+		
+		//PImage img1 = drawFirework();
+		PImage img1 = drawFlame();
 		image(img1, 0, 0);
 
 		img1.resize(10, 24);
@@ -119,11 +128,25 @@ public class ProcessingMain extends PApplet {
 		PImage img = pg.get();
 		return img;
 	}
+	
+	public PImage drawFlame() {
+		for (Iterator<Flame> flameItr = flames.iterator(); flameItr
+				.hasNext();) {
+			Flame fl = flameItr.next();
+			fl.draw(pg);
+		}
+		PImage img = pg.get();
+		return img;
+	}
 
 	public void mousePressed() {
 
 		firework.add(new Firework(this, new PVector(mouseX, mouseY), new Color(
 				(int) random(0, 255), 255, 255), 100));
+		
+		Flame flame = new Flame(this);
+		flame.update(new PVector(mouseX, mouseY));
+		flames.add(flame);
 
 	}
 

@@ -15,7 +15,7 @@ public class LEDWall {
 	private ArrayList<LEDScreen> screenList = new ArrayList<LEDScreen>();
 
 	private int NUMBER_OF_CONTROLLERS = 1;
-	private int NUMBER_OF_PORTS_IN_USE = 2;
+	private int NUMBER_OF_PORTS_IN_USE = 3;
 	private int PORTS_PR_CONTROLLER = 8;
 
 	public LEDWall(PApplet p) {
