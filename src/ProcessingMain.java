@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -25,11 +26,12 @@ public class ProcessingMain extends PApplet {
 
 	public void setup() {
 		
-		pg = createGraphics(400, 400);
+		pg = createGraphics(200, 400);
+		pg.colorMode(HSB);
 
 
 		// LEDScreen1 initialisieren
-		ledScreen1 = new LEDScreen(8, 24, this);
+		ledScreen1 = new LEDScreen(10, 24, this);
 
 		// LEDWall initialisieren
 		ledWall = new LEDWall(this);
@@ -69,7 +71,7 @@ public class ProcessingMain extends PApplet {
 		for(Lighter lg : lighterList) {
 			System.out.println(lg.toString());
 			if(lg.isInit()){
-				firework.add(new Firework(this, lg.getPos()));
+				firework.add(new Firework(this, lg.getPos(), new Color((int)random(0,255), 255, 255)));
 				System.out.println(lg.toString()+"INIT");
 				lg.setInit(false);
 			}
@@ -78,7 +80,7 @@ public class ProcessingMain extends PApplet {
 		PImage img1 = drawFirework();
 		image(img1,0,0);
 		
-		img1.resize(8, 24);
+		img1.resize(10, 24);
 		ledScreen1.update(img1);
 		ledScreen1.drawOnGui(170, 5);
 		ledWall.sendDMX();
@@ -104,7 +106,7 @@ public class ProcessingMain extends PApplet {
 	
 	public void mousePressed() {
 
-		firework.add(new Firework(this, new PVector(mouseX, mouseY)));
+		firework.add(new Firework(this, new PVector(mouseX, mouseY), new Color((int)random(0,255), 255, 255)));
 
 	}
 	

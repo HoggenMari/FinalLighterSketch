@@ -23,11 +23,9 @@ public class Firework {
 
 	private PApplet p;
 
-	public Firework(PApplet p, PVector pos){
+	public Firework(PApplet p, PVector pos, Color c){
 		this.p = p;
-		
-		   Color c = new Color(255,255,255);
-		   
+				   
 		   hanabi = new ArrayList<Fire>();
 		   
 		   for(int i=0; i<FIRE_COUNT; i++){
@@ -44,12 +42,10 @@ public class Firework {
 	{
 	  pg.beginDraw();
 	  pg.noStroke();
+	  pg.colorMode(PConstants.HSB);
 	  pg.fill(0,40);
 	  pg.rect(0,0,p.width,p.height);
-	  
-	  pg.fill(200);
-	  pg.text("click anywhere" , 10,380); 
-	  
+	  	  
 	  for(Fire fire : hanabi){ 
 	    fire.vx += 0;
 	    fire.vy += G;
@@ -62,6 +58,7 @@ public class Firework {
 	      pg.fill(fire.col.getRGB(), // RGB
 	         fire.lifetime-50); //Alpha
 	        
+	      pg.fill(fire.col.getRed(), fire.col.getGreen(), fire.col.getBlue(), fire.lifetime-50);
 	      pg.ellipse(fire.x,fire.y,4,4); // draw the fire
 	      fire.lifetime -= 0.5; // decrease lifetime
 	    }else{
