@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import processing.core.PApplet;
 import processing.core.PConstants;
@@ -30,8 +31,11 @@ public class Firework {
 
 	private float lifetime;
 
-	public Firework(PApplet p, PVector pos, Color c1, int id) {
+	private PGraphics pg;
+
+	public Firework(PApplet p, PGraphics pg, PVector pos, Color c1, int id) {
 		this.p = p;
+		this.pg = pg;
 		this.id = id;
 		this.pos = pos;
 
@@ -46,14 +50,15 @@ public class Firework {
 			float r = p.random(0, PConstants.TWO_PI);
 			float R = p.random(0, 2);
 
-			hanabi.add(new FireworkParticle(pos.x, pos.y, R * PApplet.sin(r), R
+			hanabi.add(new FireworkParticle(pg, pos.x, pos.y, R * PApplet.sin(r), R
 					* PApplet.cos(r), c1, lifetime, p.random(4, 4)));
 		}
 
 	}
 	
-	public Firework(PApplet p, PVector pos, Color c1, Color c2, int id) {
+	public Firework(PApplet p, PGraphics pg, PVector pos, Color c1, Color c2, int id) {
 		this.p = p;
+		this.pg = pg;
 		this.id = id;
 		this.pos = pos;
 
@@ -68,7 +73,7 @@ public class Firework {
 			float r = p.random(0, PConstants.TWO_PI);
 			float R = p.random(0, 2);
 
-			hanabi.add(new FireworkParticle(pos.x, pos.y, R * PApplet.sin(r), R
+			hanabi.add(new FireworkParticle(pg, pos.x, pos.y, R * PApplet.sin(r), R
 					* PApplet.cos(r), c1, lifetime, p.random(4, 4)));
 		}
 		
@@ -76,13 +81,13 @@ public class Firework {
 			float r = p.random(0, PConstants.TWO_PI);
 			float R = p.random(4, 8);
 
-			hanabi.add(new FireworkParticle(pos.x, pos.y, R * PApplet.sin(r), R
+			hanabi.add(new FireworkParticle(pg, pos.x, pos.y, R * PApplet.sin(r), R
 					* PApplet.cos(r), c2, lifetime, p.random(4, 8)));
 		}
 
 	}
 
-	public void draw(PGraphics pg) {
+	public void draw() {
 		pg.beginDraw();
 		pg.noStroke();
 		pg.colorMode(PConstants.HSB);
@@ -101,9 +106,18 @@ public class Firework {
 			pg.popMatrix();
 		} else {
 			//paint "flower"
-			for (FireworkParticle fire : hanabi) {
-				fire.draw(pg);
+			for (Iterator<FireworkParticle> firePartItr = hanabi.iterator(); firePartItr
+					.hasNext();) {
+				FireworkParticle fw = firePartItr.next();
+				if (fw.isDead()) {
+					firePartItr.remove();
+				} else
+					fw.draw();
 			}
+			
+			/*for (FireworkParticle fire : hanabi) {
+				fire.draw(pg);
+			}*/
 		}
 
 		pg.endDraw();
@@ -114,10 +128,11 @@ public class Firework {
 
 	public boolean isDead() {
 		for (FireworkParticle fire : hanabi) {
-			if (fire.lifetime - 50 > 0) {
+			if (!fire.isDead()) {
 				return false;
 			}
 		}
+		System.out.println("TRUE");
 		return true;
 	}
 

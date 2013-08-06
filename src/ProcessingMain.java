@@ -74,7 +74,7 @@ public class ProcessingMain extends PApplet {
 		for (Lighter lg : lighterList) {
 			System.out.println(lg.toString());
 			if (lg.isInit()) {
-				firework.add(new Firework(this, lg.getPos(), new Color(
+				firework.add(new Firework(this, pg, lg.getPos(), new Color(
 						(int) random(0, 255), 255, 255), new Color(
 								(int) random(0, 255), 255, 255), lg.getLighterID()));
 				System.out.println(lg.toString() + "INIT");
@@ -87,7 +87,7 @@ public class ProcessingMain extends PApplet {
 					}
 				}
 				if(!fwWithID){
-					firework.add(new Firework(this, lg.getInitPos(), new Color(
+					firework.add(new Firework(this, pg, lg.getInitPos(), new Color(
 					(int) random(0, 255), 255, 255), lg.getLighterID()));
 					System.out.println(lg.toString() + "REACTIVATED");
 				}
@@ -100,7 +100,7 @@ public class ProcessingMain extends PApplet {
 		}
 		
 		PImage img1 = drawFirework();
-		img1 = drawFlame();
+		//img1 = drawFlame();
 		image(img1, 0, 0);
 
 		img1.resize(10, 24);
@@ -108,10 +108,10 @@ public class ProcessingMain extends PApplet {
 		ledScreen1.drawOnGui(170, 5);
 		ledWall.sendDMX();
 
-		for(Firework fw :firework) {
+		/*for(Firework fw :firework) {
 			System.out.println(fw.getId());
-		}
-		//System.out.println(firework.size());
+		}*/
+		System.out.println(firework.size());
 
 	}
 
@@ -123,7 +123,7 @@ public class ProcessingMain extends PApplet {
 			if (fw.isDead()) {
 				fireItr.remove();
 			} else
-				fw.draw(pg);
+				fw.draw();
 		}
 
 		PImage img = pg.get();
@@ -142,14 +142,14 @@ public class ProcessingMain extends PApplet {
 
 	public void mousePressed() {
 
-		firework.add(new Firework(this, new PVector(mouseX, mouseY), new Color(
+		firework.add(new Firework(this, pg, new PVector(mouseX, mouseY), new Color(
 				(int) random(0, 255), 255, 255), new Color(
 						(int) random(0, 255), 255, 255), 100));
 
 		
-		Flame flame = new Flame(this);
+		/*Flame flame = new Flame(this);
 		flame.update(new PVector(mouseX, mouseY));
-		flames.add(flame);
+		flames.add(flame);*/
 
 	}
 
