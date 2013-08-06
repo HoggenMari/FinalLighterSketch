@@ -30,7 +30,7 @@ public class Firework {
 
 	private float lifetime;
 
-	public Firework(PApplet p, PVector pos, Color c, int id) {
+	public Firework(PApplet p, PVector pos, Color c1, int id) {
 		this.p = p;
 		this.id = id;
 		this.pos = pos;
@@ -47,7 +47,37 @@ public class Firework {
 			float R = p.random(0, 2);
 
 			hanabi.add(new FireworkParticle(pos.x, pos.y, R * PApplet.sin(r), R
-					* PApplet.cos(r), c, lifetime));
+					* PApplet.cos(r), c1, lifetime, p.random(4, 4)));
+		}
+
+	}
+	
+	public Firework(PApplet p, PVector pos, Color c1, Color c2, int id) {
+		this.p = p;
+		this.id = id;
+		this.pos = pos;
+
+		y = p.height;
+		x = pos.x;
+		
+		lifetime = p.random(100, 500);
+
+		hanabi = new ArrayList<FireworkParticle>();
+
+		for (int i = 0; i < FIRE_COUNT; i++) {
+			float r = p.random(0, PConstants.TWO_PI);
+			float R = p.random(0, 2);
+
+			hanabi.add(new FireworkParticle(pos.x, pos.y, R * PApplet.sin(r), R
+					* PApplet.cos(r), c1, lifetime, p.random(4, 4)));
+		}
+		
+		for (int i=0; i < 100; i++) {
+			float r = p.random(0, PConstants.TWO_PI);
+			float R = p.random(4, 8);
+
+			hanabi.add(new FireworkParticle(pos.x, pos.y, R * PApplet.sin(r), R
+					* PApplet.cos(r), c2, lifetime, p.random(4, 8)));
 		}
 
 	}
@@ -61,13 +91,13 @@ public class Firework {
 
 		//paint tail
 		if (y > pos.y) {
-			y += -5;
+			y += -8;
 			x += p.random(-1, 1);
 			pg.noStroke();
 			pg.fill(0, 0, 255);
 			pg.pushMatrix();
 			pg.translate(x, y);
-			pg.ellipse(0, 0, 10, 15);
+			pg.ellipse(0, 0, 15, 20);
 			pg.popMatrix();
 		} else {
 			//paint "flower"

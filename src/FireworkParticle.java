@@ -12,14 +12,16 @@ public class FireworkParticle {
 
 	float lifetime;
 	final float G = (float) 0.04;
+	private float size;
 
-	public FireworkParticle(float x, float y, float vx, float vy, Color col, float lifetime) {
+	public FireworkParticle(float x, float y, float vx, float vy, Color col, float lifetime, float size) {
 		this.x = x;
 		this.y = y;
 		this.vx = vx;
 		this.vy = vy;
 		this.col = col;
 		this.lifetime = lifetime;
+		this.size = size;
 	}
 
 	public void draw(PGraphics pg) {
@@ -33,7 +35,7 @@ public class FireworkParticle {
 		if (lifetime - 50 > 0) {
 			pg.noStroke();
 			pg.fill(col.getRed(), col.getGreen(), col.getBlue(), lifetime - 50);
-			pg.ellipse(x, y, 4, 4); // draw the fire
+			pg.ellipse(x, y, size, size); // draw the fire
 			lifetime -= 0.5; // decrease lifetime
 		}
 	}
