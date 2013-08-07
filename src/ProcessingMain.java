@@ -53,7 +53,7 @@ public class ProcessingMain extends PApplet {
 		lighterList.get(0).toString();
 
 		for (int i = 0; i < Serial.list().length; i++) {
-			System.out.println("Device " + i + " " + Serial.list()[i]);
+			//System.out.println("Device " + i + " " + Serial.list()[i]);
 		}
 		myPort = new Serial(this, Serial.list()[4], 9600);
 		myPort.clear();
@@ -69,42 +69,8 @@ public class ProcessingMain extends PApplet {
 
 		background(0);
 		
-
-		
-		for (Lighter lg : lighterList) {
-			if(lg.isInit()) {
-				System.out.println("!!!!!INIT!!!!!");
-				Flame flame = new Flame(this, lg.getLighterID());
-				flame.update(lg.getPos());
-				flames.add(flame);
-				lg.setInit(false);
-			}
-			else if(lg.isActive()) {
-				System.out.println("!!!!!ACTIVE!!!!!");
-				for(Flame fl : flames) {
-					fl.update(lg.getPos());
-					fl.draw(pg);
-				}
-			} else {				
-				for (Iterator<Flame> flameItr = flames.iterator(); flameItr
-						.hasNext();) {
-					Flame fl = flameItr.next();
-					if(lg.getLighterID()==fl.getFlameID()) {
-						System.out.println("!!!!!REMOVE!!!!!");
-
-						flameItr.remove();
-					}
-				}
-			}
-		}
-
-		//Flame verfolgen
-		for(Flame fl : flames) {
-			fl.update(new PVector(mouseX, mouseY));
-		}
-		
-		//PImage img1 = drawFirework();
-		PImage img1 = drawFlame();
+		PImage img1 = drawFirework();
+		//PImage img1 = drawFlame();
 		image(img1, 0, 0);
 
 		img1.resize(10, 24);
@@ -116,7 +82,7 @@ public class ProcessingMain extends PApplet {
 			System.out.println(fw.getId());
 		}*/
 		//System.out.println(firework.size());
-		System.out.println(flames.size());
+		//System.out.println(flames.size());
 
 	}
 
@@ -125,12 +91,12 @@ public class ProcessingMain extends PApplet {
 		boolean fwWithID=false;
 
 		for (Lighter lg : lighterList) {
-			System.out.println(lg.toString());
+			//System.out.println(lg.toString());
 			if (lg.isInit()) {
 				firework.add(new Firework(this, pg, lg.getPos(), new Color(
 						(int) random(0, 255), 255, 255), new Color(
 								(int) random(0, 255), 255, 255), lg.getLighterID()));
-				System.out.println(lg.toString() + "INIT");
+				//System.out.println(lg.toString() + "INIT");
 				lg.setInit(false);
 			}
 			if (lg.isActive()) {
@@ -142,7 +108,7 @@ public class ProcessingMain extends PApplet {
 				if(!fwWithID){
 					firework.add(new Firework(this, pg, lg.getInitPos(), new Color(
 					(int) random(0, 255), 255, 255), lg.getLighterID()));
-					System.out.println(lg.toString() + "REACTIVATED");
+					//System.out.println(lg.toString() + "REACTIVATED");
 				}
 			}
 		}
@@ -162,6 +128,39 @@ public class ProcessingMain extends PApplet {
 	}
 	
 	public PImage drawFlame() {
+		
+		for (Lighter lg : lighterList) {
+			if(lg.isInit()) {
+				//System.out.println("!!!!!INIT!!!!!");
+				Flame flame = new Flame(this, lg.getLighterID());
+				flame.update(lg.getPos());
+				flames.add(flame);
+				lg.setInit(false);
+			}
+			else if(lg.isActive()) {
+				//System.out.println("!!!!!ACTIVE!!!!!");
+				for(Flame fl : flames) {
+					fl.update(lg.getPos());
+					fl.draw(pg);
+				}
+			} else if(!lg.isActive()){				
+				for (Iterator<Flame> flameItr = flames.iterator(); flameItr
+						.hasNext();) {
+					Flame fl = flameItr.next();
+					if(lg.getLighterID()==fl.getFlameID()) {
+						//System.out.println("!!!!!REMOVE!!!!!");
+
+						flameItr.remove();
+					}
+				}
+			}
+		}
+
+		//Flame verfolgen
+		for(Flame fl : flames) {
+			fl.update(new PVector(mouseX, mouseY));
+		}
+		
 		for (Iterator<Flame> flameItr = flames.iterator(); flameItr
 				.hasNext();) {
 			Flame fl = flameItr.next();
@@ -173,9 +172,9 @@ public class ProcessingMain extends PApplet {
 
 	public void mousePressed() {
 
-		/*firework.add(new Firework(this, pg, new PVector(mouseX, mouseY), new Color(
+		firework.add(new Firework(this, pg, new PVector(mouseX, mouseY), new Color(
 				(int) random(0, 255), 255, 255), new Color(
-						(int) random(0, 255), 255, 255), 100));*/
+						(int) random(0, 255), 255, 255), 100));
 
 		
 		Flame flame = new Flame(this, 100);

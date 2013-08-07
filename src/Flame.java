@@ -33,8 +33,8 @@ public class Flame {
 					2), -3));
 		}
 
-		System.out.println(ppos);
-		System.out.println(pos);
+		//System.out.println(ppos);
+		//System.out.println(pos);
 
 		if (ppos.x == pos.x && ppos.y == pos.y) {
 			if(ADD_MAX_FLAME_PARTICLE < 5) {

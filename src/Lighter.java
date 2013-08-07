@@ -16,10 +16,17 @@ public class Lighter {
 	private BlockingQueue<PVector> pos_queue;
 	private PVector size;
 
+	private boolean idle;
+	
+	public enum State {
+		IDLE, INIT, ACTIVE, REMOVE
+	}
+
 
 	public Lighter(int lighterID, PVector size){
 		this.lighterID = lighterID;
 		this.pos = new PVector(1023,1023);
+		this.idle = true;
 		this.active = false;
 		this.init = false;
 		this.pos_queue = new LinkedBlockingQueue<PVector>(10);
@@ -32,24 +39,14 @@ public class Lighter {
 		if(pos_queue.remainingCapacity()==0){
 			pos_queue.remove();
 			pos_queue.add(pos);
-		}
+		}else pos_queue.add(pos);
 		//Save previous Position
 		//New position
 		pos.x = (pos.x/MAX_X)*size.x;
 		pos.y = (pos.y/MAX_Y)*size.y;
 		this.pos = pos;
 		
-		int count=0;
-		
-		//check last 10 Elements
-		if(!pos_queue.isEmpty()) {
-			PVector[] lastTen = (PVector[]) pos_queue.toArray();
-			for(PVector item : lastTen) {
-				if(item.x==1023 && item.y==1023) {
-					count++;
-				}
-			}
-		}
+		System.out.println(pos_queue.toString());
 		
 		//check status
 		/*if(pos.x==1023 && pos.y==1023){
@@ -67,19 +64,18 @@ public class Lighter {
 		if(ppos.x == size.x && ppos.y == size.y && pos.x != size.x && pos.y != size.y) {
 			initPos = pos;
 			init = true;
+			idle = false;
 			System.out.println("FLANKENWECHSEL");
 		}
 		else if(ppos.x != size.x && ppos.y != size.y && pos.x != size.x && pos.y != size.y) {
 			init = false;
 			active = true;
 			System.out.println("AKTIV");
-		} else if(count > 6) {
-			init = false;
-			active = true;
 		}
 		else {
 			init = false;
 			active = false;
+			System.out.println("REMOVE");
 		}
 	}
 	
