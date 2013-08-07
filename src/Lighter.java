@@ -39,6 +39,18 @@ public class Lighter {
 		pos.y = (pos.y/MAX_Y)*size.y;
 		this.pos = pos;
 		
+		int count=0;
+		
+		//check last 10 Elements
+		if(!pos_queue.isEmpty()) {
+			PVector[] lastTen = (PVector[]) pos_queue.toArray();
+			for(PVector item : lastTen) {
+				if(item.x==1023 && item.y==1023) {
+					count++;
+				}
+			}
+		}
+		
 		//check status
 		/*if(pos.x==1023 && pos.y==1023){
 			active = false;
@@ -61,7 +73,11 @@ public class Lighter {
 			init = false;
 			active = true;
 			System.out.println("AKTIV");
-		} else {
+		} else if(count > 6) {
+			init = false;
+			active = true;
+		}
+		else {
 			init = false;
 			active = false;
 		}

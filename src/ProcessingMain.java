@@ -69,6 +69,59 @@ public class ProcessingMain extends PApplet {
 
 		background(0);
 		
+
+		
+		for (Lighter lg : lighterList) {
+			if(lg.isInit()) {
+				System.out.println("!!!!!INIT!!!!!");
+				Flame flame = new Flame(this, lg.getLighterID());
+				flame.update(lg.getPos());
+				flames.add(flame);
+				lg.setInit(false);
+			}
+			else if(lg.isActive()) {
+				System.out.println("!!!!!ACTIVE!!!!!");
+				for(Flame fl : flames) {
+					fl.update(lg.getPos());
+					fl.draw(pg);
+				}
+			} else {				
+				for (Iterator<Flame> flameItr = flames.iterator(); flameItr
+						.hasNext();) {
+					Flame fl = flameItr.next();
+					if(lg.getLighterID()==fl.getFlameID()) {
+						System.out.println("!!!!!REMOVE!!!!!");
+
+						flameItr.remove();
+					}
+				}
+			}
+		}
+
+		//Flame verfolgen
+		for(Flame fl : flames) {
+			fl.update(new PVector(mouseX, mouseY));
+		}
+		
+		//PImage img1 = drawFirework();
+		PImage img1 = drawFlame();
+		image(img1, 0, 0);
+
+		img1.resize(10, 24);
+		ledScreen1.update(img1);
+		ledScreen1.drawOnGui(170, 5);
+		ledWall.sendDMX();
+
+		/*for(Firework fw :firework) {
+			System.out.println(fw.getId());
+		}*/
+		//System.out.println(firework.size());
+		System.out.println(flames.size());
+
+	}
+
+	public PImage drawFirework() {
+
 		boolean fwWithID=false;
 
 		for (Lighter lg : lighterList) {
@@ -93,30 +146,8 @@ public class ProcessingMain extends PApplet {
 				}
 			}
 		}
-
-		//Flame verfolgen
-		for(Flame fl : flames) {
-			fl.update(new PVector(mouseX, mouseY));
-		}
 		
-		PImage img1 = drawFirework();
-		//img1 = drawFlame();
-		image(img1, 0, 0);
-
-		img1.resize(10, 24);
-		ledScreen1.update(img1);
-		ledScreen1.drawOnGui(170, 5);
-		ledWall.sendDMX();
-
-		/*for(Firework fw :firework) {
-			System.out.println(fw.getId());
-		}*/
-		System.out.println(firework.size());
-
-	}
-
-	public PImage drawFirework() {
-
+		
 		for (Iterator<Firework> fireItr = firework.iterator(); fireItr
 				.hasNext();) {
 			Firework fw = fireItr.next();
@@ -142,14 +173,14 @@ public class ProcessingMain extends PApplet {
 
 	public void mousePressed() {
 
-		firework.add(new Firework(this, pg, new PVector(mouseX, mouseY), new Color(
+		/*firework.add(new Firework(this, pg, new PVector(mouseX, mouseY), new Color(
 				(int) random(0, 255), 255, 255), new Color(
-						(int) random(0, 255), 255, 255), 100));
+						(int) random(0, 255), 255, 255), 100));*/
 
 		
-		/*Flame flame = new Flame(this);
+		Flame flame = new Flame(this, 100);
 		flame.update(new PVector(mouseX, mouseY));
-		flames.add(flame);*/
+		flames.add(flame);
 
 	}
 
