@@ -1,6 +1,5 @@
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.EventObject;
 import java.util.Iterator;
 
 import processing.core.PApplet;
@@ -11,9 +10,17 @@ import processing.serial.*;
 
 public class ProcessingMain extends PApplet {
 
-	/**
-	 * 
+	/*
+	 * Parameter Settings Start
 	 */
+
+	boolean serial = false;
+	boolean screenOut = false;
+
+	/*
+	 * Parameter Settings End
+	 */
+
 	private static final long serialVersionUID = 1L;
 	int lf = 10; // Linefeed in ASCII
 	String myString = null;
@@ -25,7 +32,7 @@ public class ProcessingMain extends PApplet {
 	private PGraphics pg;
 	private ArrayList<Firework> firework;
 	private ArrayList<Flame> flames;
-	
+
 	Flame flame = new Flame(this, 100);
 
 	public void setup() {
@@ -49,76 +56,74 @@ public class ProcessingMain extends PApplet {
 
 		// Firework initialisiren
 		firework = new ArrayList<Firework>();
-		
+
 		// Fire initialisieren
 		flames = new ArrayList<Flame>();
 
-		lighterList.get(0).toString();
-
-		for (int i = 0; i < Serial.list().length; i++) {
-			//System.out.println("Device " + i + " " + Serial.list()[i]);
-		}
+		// Serial Arduino initialisieren
+		if(serial){
+		/*
+		 * for (int i = 0; i < Serial.list().length; i++) {
+		 * System.out.println("Device " + i + " " + Serial.list()[i]); }
+		 */
 		myPort = new Serial(this, Serial.list()[4], 9600);
 		myPort.clear();
+		}
 		
+		// GUI
 		size(200, 400);
-
-		background(0, 0, 0);
+		background(0);
 
 	}
 
 	public void draw() {
 
 		background(0);
-		
-		//PImage img1 = drawFirework();
+
+		// PImage img1 = drawFirework();
 		PImage img1 = drawFlame();
 		image(img1, 0, 0);
 
+		// Ausgabe fŸr LEDScreen
+		if(screenOut){
 		img1.resize(10, 24);
 		ledScreen1.update(img1);
-		ledScreen1.drawOnGui(170, 5);
+		ledScreen1.drawOnGui(210, 5);
 		ledWall.sendDMX();
-	
-
-		/*for(Firework fw :firework) {
-			System.out.println(fw.getId());
-		}*/
-		//System.out.println(firework.size());
-		//System.out.println(flames.size());
+		}
 
 	}
 
 	public PImage drawFirework() {
 
-		boolean fwWithID=false;
+		boolean fwWithID = false;
 
 		for (Lighter lg : lighterList) {
-			
-			if (lg.getLighterState().toString()=="INIT") {
+
+			if (lg.getLighterState().toString() == "INIT") {
 				firework.add(new Firework(this, pg, lg.getPos(), new Color(
 						(int) random(0, 255), 255, 255), new Color(
-								(int) random(0, 255), 255, 255), lg.getLighterID()));
+						(int) random(0, 255), 255, 255), lg.getLighterID()));
 				System.out.println("MAIN - INIT");
 				lg.setLighterState(Lighter.State.ACTIVE);
 			}
-			
-			if (lg.getLighterState().toString()=="ACTIVE") {
-				for(Firework fw : firework) {
-					if(fw.getId()==lg.getLighterID()){
-						fwWithID=true;
+
+			if (lg.getLighterState().toString() == "ACTIVE") {
+				for (Firework fw : firework) {
+					if (fw.getId() == lg.getLighterID()) {
+						fwWithID = true;
 					}
 				}
 				System.out.println("MAIN - ACTIVE");
-				if(!fwWithID){
-					firework.add(new Firework(this, pg, lg.getInitPos(), new Color(
-					(int) random(0, 255), 255, 255), lg.getLighterID()));
+				if (!fwWithID) {
+					firework.add(new Firework(this, pg, lg.getInitPos(),
+							new Color((int) random(0, 255), 255, 255), lg
+									.getLighterID()));
 				}
 			}
-			
+
 		}
-		
-		
+
 		for (Iterator<Firework> fireItr = firework.iterator(); fireItr
 				.hasNext();) {
 			Firework fw = fireItr.next();
@@ -131,35 +136,34 @@ public class ProcessingMain extends PApplet {
 		PImage img = pg.get();
 		return img;
 	}
-	
+
 	public PImage drawFlame() {
-		
+
+		// Lighter Flame
 		for (Lighter lg : lighterList) {
-			if(lg.getLighterState().toString()=="INIT") {
+			if (lg.getLighterState().toString() == "INIT") {
 				System.out.println("!!!!!INIT!!!!!");
 				Flame flame = new Flame(this, lg.getLighterID());
 				flame.update(lg.getPos());
 				flames.add(flame);
 				lg.setLighterState(Lighter.State.ACTIVE);
-			}
-			else if(lg.getLighterState().toString()=="ACTIVE") {
+			} else if (lg.getLighterState().toString() == "ACTIVE") {
 				System.out.println("!!!!!ACTIVE!!!!!");
-				for(Flame fl : flames) {
+				for (Flame fl : flames) {
 					fl.update(lg.getPos());
 					fl.draw(pg);
 				}
-			}
-			else if(lg.getLighterState().toString()=="LOST") {
+			} else if (lg.getLighterState().toString() == "LOST") {
 				System.out.println("!!!!!LOST!!!!!");
-				for(Flame fl : flames) {
+				for (Flame fl : flames) {
 					fl.update(lg.getInitPos());
 					fl.draw(pg);
 				}
-			} else if(lg.getLighterState().toString()=="IDLE"){				
+			} else if (lg.getLighterState().toString() == "IDLE") {
 				for (Iterator<Flame> flameItr = flames.iterator(); flameItr
 						.hasNext();) {
 					Flame fl = flameItr.next();
-					if(lg.getLighterID()==fl.getFlameID()) {
+					if (lg.getLighterID() == fl.getFlameID()) {
 						System.out.println("!!!!!REMOVE!!!!!");
 
 						flameItr.remove();
@@ -168,37 +172,33 @@ public class ProcessingMain extends PApplet {
 			}
 		}
 
-		//Flame verfolgen
-		/*for(Flame fl : flames) {
-			fl.update(new PVector(mouseX, mouseY));
-		}*/
+		// Mouse Flame
+		for(Flame fl : flames) { fl.update(new PVector(mouseX, mouseY)); }
 		
-		for (Iterator<Flame> flameItr = flames.iterator(); flameItr
-				.hasNext();) {
+
+		// Draw all Flames
+		for (Iterator<Flame> flameItr = flames.iterator(); flameItr.hasNext();) {
 			Flame fl = flameItr.next();
 			fl.draw(pg);
 		}
+
 		PImage img = pg.get();
 		return img;
 	}
 
-	/*public void mousePressed() {
+	public void mousePressed() {
 
-		firework.add(new Firework(this, pg, new PVector(mouseX, mouseY), new Color(
-				(int) random(0, 255), 255, 255), new Color(
+		firework.add(new Firework(this, pg, new PVector(mouseX, mouseY),
+				new Color((int) random(0, 255), 255, 255), new Color(
 						(int) random(0, 255), 255, 255), 100));
 
-		
 		flame.update(new PVector(mouseX, mouseY));
 		flames.add(flame);
 
-	}*/
-	
-	public void mouseReleased() {
-		//flames.remove(flame);
 	}
-	
-	
+
+	// Arduino LighterProtocoll: "posX,posY"-items split with ',' - tuples split
+	// with ':' - end of 4 tuples is '\n'
 	public void serialEvent(Serial myPort) {
 		myString = myPort.readStringUntil(lf);
 		if (myString != null) {
@@ -210,17 +210,15 @@ public class ProcessingMain extends PApplet {
 				if (spl2.length >= 2) {
 					int posX = parseWithDefault(spl2[0], 0);
 					int posY = parseWithDefault(spl2[1], 0);
+
+					// Set new position of the Lighters
 					lighterList.get(i).setPosition(new PVector(posX, posY));
 				}
-				// System.out.println(lighterList.get(i).toString());
-				// float num = float(list[i]);
-				// num[i]=Integer.parseInt(list[i]); // Converts and prints
-				// float
-				// println(num[i]);
 			}
 		}
 	}
 
+	// Auxiliary function for parsing Arduino Data
 	public static int parseWithDefault(String number, int defaultVal) {
 		try {
 			return Integer.parseInt(number);
@@ -229,6 +227,7 @@ public class ProcessingMain extends PApplet {
 		}
 	}
 
+	// Auxiliary function for Blur-Effect
 	void blur(float trans, PGraphics pg) {
 		pg.noStroke();
 		pg.fill(0, trans);

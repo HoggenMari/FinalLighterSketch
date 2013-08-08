@@ -1,6 +1,3 @@
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import processing.core.PVector;
 
 
@@ -10,10 +7,9 @@ public class Lighter {
 
 	static int MAX_X = 1023;
 	static int MAX_Y = 1023;
-	int lost = 0;
+	int lostCounter = 0;
 
 	private PVector pos, ppos, initPos, lostPos;
-	private BlockingQueue<PVector> pos_queue;
 	public PVector getLostPos() {
 		return lostPos;
 	}
@@ -30,48 +26,44 @@ public class Lighter {
 	public Lighter(int lighterID, PVector size){
 		this.lighterID = lighterID;
 		this.pos = new PVector(1023,1023);
-		this.pos_queue = new LinkedBlockingQueue<PVector>(10);
 		this.size = size;
 		lighterState = State.IDLE;
 	}
 	
 	public void setPosition(PVector pos){
-		ppos = this.pos;
-		if(pos_queue.remainingCapacity()==0){
-			pos_queue.remove();
-			pos_queue.add(pos);
-		}else pos_queue.add(pos);
 		//Save previous Position
-		//New position
+		ppos = this.pos;
+		
+		//Normalize & Save new position
 		pos.x = (pos.x/MAX_X)*size.x;
 		pos.y = (pos.y/MAX_Y)*size.y;
 		this.pos = pos;
 		
-		//System.out.println(pos_queue.toString());
-		
+		/*
+		 * Change Lighter States
+		 */
+		//IDLE -> INIT
 		if(lighterState == State.IDLE && pos.x != size.x && pos.y != size.y) {
 			initPos = pos;
 			lighterState = State.INIT;
 			System.out.println("FLANKENWECHSEL");
-			lost=0;
+			lostCounter=0;
 		}
+		//INIT -> ACTIVE
 		else if(lighterState == State.INIT && pos.x != size.x && pos.y != size.y) {
 			lostPos = pos;
 			lighterState = State.ACTIVE;
 			System.out.println("AKTIV");
-			lost=0;
+			lostCounter=0;
 		}
-		/*else if(lighterState == State.INIT && pos.x == size.x && pos.y == size.y) {
-			if (lost<5) {
-				lost++;
-			} else lighterState = State.IDLE;
-		}*/
+		//ACTIVE -> LOST
 		else if(lighterState == State.ACTIVE && pos.x == size.x && pos.y == size.y){
 			lighterState = State.LOST;
 		}
+		//LOST -> IDLE
 		else if(lighterState == State.LOST && pos.x == size.x && pos.y == size.y){
-			if (lost<10) {
-				lost++;
+			if (lostCounter<10) {
+				lostCounter++;
 			} else { 
 				lighterState = State.IDLE;
 				System.out.println("REMOVE");
