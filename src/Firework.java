@@ -132,7 +132,6 @@ public class Firework {
 				return false;
 			}
 		}
-		System.out.println("TRUE");
 		return true;
 	}
 

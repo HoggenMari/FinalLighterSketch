@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.EventObject;
 import java.util.Iterator;
 
 import processing.core.PApplet;
@@ -24,6 +25,8 @@ public class ProcessingMain extends PApplet {
 	private PGraphics pg;
 	private ArrayList<Firework> firework;
 	private ArrayList<Flame> flames;
+	
+	Flame flame = new Flame(this, 100);
 
 	public void setup() {
 
@@ -57,8 +60,7 @@ public class ProcessingMain extends PApplet {
 		}
 		myPort = new Serial(this, Serial.list()[4], 9600);
 		myPort.clear();
-		num = new int[10];
-
+		
 		size(200, 400);
 
 		background(0, 0, 0);
@@ -69,14 +71,15 @@ public class ProcessingMain extends PApplet {
 
 		background(0);
 		
-		PImage img1 = drawFirework();
-		//PImage img1 = drawFlame();
+		//PImage img1 = drawFirework();
+		PImage img1 = drawFlame();
 		image(img1, 0, 0);
 
 		img1.resize(10, 24);
 		ledScreen1.update(img1);
 		ledScreen1.drawOnGui(170, 5);
 		ledWall.sendDMX();
+	
 
 		/*for(Firework fw :firework) {
 			System.out.println(fw.getId());
@@ -91,26 +94,28 @@ public class ProcessingMain extends PApplet {
 		boolean fwWithID=false;
 
 		for (Lighter lg : lighterList) {
-			//System.out.println(lg.toString());
-			if (lg.isInit()) {
+			
+			if (lg.getLighterState().toString()=="INIT") {
 				firework.add(new Firework(this, pg, lg.getPos(), new Color(
 						(int) random(0, 255), 255, 255), new Color(
 								(int) random(0, 255), 255, 255), lg.getLighterID()));
-				//System.out.println(lg.toString() + "INIT");
-				lg.setInit(false);
+				System.out.println("MAIN - INIT");
+				lg.setLighterState(Lighter.State.ACTIVE);
 			}
-			if (lg.isActive()) {
+			
+			if (lg.getLighterState().toString()=="ACTIVE") {
 				for(Firework fw : firework) {
 					if(fw.getId()==lg.getLighterID()){
 						fwWithID=true;
 					}
 				}
+				System.out.println("MAIN - ACTIVE");
 				if(!fwWithID){
 					firework.add(new Firework(this, pg, lg.getInitPos(), new Color(
 					(int) random(0, 255), 255, 255), lg.getLighterID()));
-					//System.out.println(lg.toString() + "REACTIVATED");
 				}
 			}
+			
 		}
 		
 		
@@ -130,25 +135,32 @@ public class ProcessingMain extends PApplet {
 	public PImage drawFlame() {
 		
 		for (Lighter lg : lighterList) {
-			if(lg.isInit()) {
-				//System.out.println("!!!!!INIT!!!!!");
+			if(lg.getLighterState().toString()=="INIT") {
+				System.out.println("!!!!!INIT!!!!!");
 				Flame flame = new Flame(this, lg.getLighterID());
 				flame.update(lg.getPos());
 				flames.add(flame);
-				lg.setInit(false);
+				lg.setLighterState(Lighter.State.ACTIVE);
 			}
-			else if(lg.isActive()) {
-				//System.out.println("!!!!!ACTIVE!!!!!");
+			else if(lg.getLighterState().toString()=="ACTIVE") {
+				System.out.println("!!!!!ACTIVE!!!!!");
 				for(Flame fl : flames) {
 					fl.update(lg.getPos());
 					fl.draw(pg);
 				}
-			} else if(!lg.isActive()){				
+			}
+			else if(lg.getLighterState().toString()=="LOST") {
+				System.out.println("!!!!!LOST!!!!!");
+				for(Flame fl : flames) {
+					fl.update(lg.getInitPos());
+					fl.draw(pg);
+				}
+			} else if(lg.getLighterState().toString()=="IDLE"){				
 				for (Iterator<Flame> flameItr = flames.iterator(); flameItr
 						.hasNext();) {
 					Flame fl = flameItr.next();
 					if(lg.getLighterID()==fl.getFlameID()) {
-						//System.out.println("!!!!!REMOVE!!!!!");
+						System.out.println("!!!!!REMOVE!!!!!");
 
 						flameItr.remove();
 					}
@@ -157,9 +169,9 @@ public class ProcessingMain extends PApplet {
 		}
 
 		//Flame verfolgen
-		for(Flame fl : flames) {
+		/*for(Flame fl : flames) {
 			fl.update(new PVector(mouseX, mouseY));
-		}
+		}*/
 		
 		for (Iterator<Flame> flameItr = flames.iterator(); flameItr
 				.hasNext();) {
@@ -170,19 +182,23 @@ public class ProcessingMain extends PApplet {
 		return img;
 	}
 
-	public void mousePressed() {
+	/*public void mousePressed() {
 
 		firework.add(new Firework(this, pg, new PVector(mouseX, mouseY), new Color(
 				(int) random(0, 255), 255, 255), new Color(
 						(int) random(0, 255), 255, 255), 100));
 
 		
-		Flame flame = new Flame(this, 100);
 		flame.update(new PVector(mouseX, mouseY));
 		flames.add(flame);
 
+	}*/
+	
+	public void mouseReleased() {
+		//flames.remove(flame);
 	}
-
+	
+	
 	public void serialEvent(Serial myPort) {
 		myString = myPort.readStringUntil(lf);
 		if (myString != null) {
