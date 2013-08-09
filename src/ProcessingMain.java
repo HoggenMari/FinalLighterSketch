@@ -51,7 +51,7 @@ public class ProcessingMain extends PApplet {
 		// LighterList initialisieren
 		lighterList = new ArrayList<Lighter>();
 		for (int i = 0; i < 4; i++) {
-			lighterList.add(new Lighter(i, new PVector(pg.width, pg.height)));
+			lighterList.add(new Lighter(i, new PVector(pg.width, pg.height), 15));
 		}
 
 		// Firework initialisiren
@@ -161,7 +161,8 @@ public class ProcessingMain extends PApplet {
 				for (Flame fl : flames) {
 					if(fl.getFlameID()==lg.getLighterID()) {
 						//fl.update(lg.getLostPos());
-						fl.kill(lg.getLostPos());
+						System.out.println("!!!!!LOST!!!!!");
+						fl.kill(lg.getLostPos(), lg.getLostCounter());
 						fl.draw(pg);
 					}
 				}

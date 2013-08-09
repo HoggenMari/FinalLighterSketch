@@ -7,24 +7,27 @@ public class Lighter {
 
 	static int MAX_X = 1023;
 	static int MAX_Y = 1023;
-	int lostCounter = 0;
+	int lostCounter = 50;
 
 	private PVector pos, ppos, initPos, lostPos;
 
 	private PVector size;
 
 	private State lighterState;
+
+	private int delay;
 	
 	public enum State {
 		IDLE, INIT, ACTIVE, LOST
 	}
 
 
-	public Lighter(int lighterID, PVector size){
+	public Lighter(int lighterID, PVector size, int delay){
 		this.lighterID = lighterID;
 		this.pos = new PVector(1023,1023);
 		this.size = size;
 		lighterState = State.IDLE;
+		this.delay = delay;
 	}
 	
 	public void setPosition(PVector pos){
@@ -44,7 +47,7 @@ public class Lighter {
 			initPos = pos;
 			lighterState = State.INIT;
 			System.out.println("FLANKENWECHSEL");
-			lostCounter=0;
+			lostCounter=delay;
 			lostPos=pos;
 		}
 		//ACTIVE -> ACTIVE
@@ -52,7 +55,7 @@ public class Lighter {
 			lostPos = pos;
 			lighterState = State.ACTIVE;
 			System.out.println("AKTIV");
-			lostCounter=0;
+			lostCounter=delay;
 			System.out.println(lostPos);
 		}
 		//ACTIVE -> LOST
@@ -62,8 +65,8 @@ public class Lighter {
 		}
 		//LOST -> IDLE
 		else if(lighterState == State.LOST && pos.x == size.x && pos.y == size.y){
-			if (lostCounter<50) {
-				lostCounter++;
+			if (lostCounter>0) {
+				lostCounter--;
 			} else { 
 				lighterState = State.IDLE;
 				System.out.println("REMOVE");
@@ -72,7 +75,7 @@ public class Lighter {
 		//LOST -> ACTIVE
 		else if(lighterState == State.LOST && pos.x != size.x && pos.y != size.y){
 				lighterState = State.ACTIVE;
-				lostCounter=0;
+				lostCounter=delay;
 				System.out.println("LOST->ACTIVE");
 		}
 	}
@@ -118,6 +121,10 @@ public class Lighter {
 
 	public PVector getLostPos() {
 		return lostPos;
+	}
+
+	public int getLostCounter() {
+		return lostCounter;
 	}
 
 

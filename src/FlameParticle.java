@@ -16,7 +16,7 @@ public class FlameParticle {
     int ttl = 120;
 
 
-	public FlameParticle(PApplet p, float x, float y, float vx, float vy) {
+	public FlameParticle(PApplet p, float x, float y, float vx, float vy, float alpha) {
 		this.p = p;
 		//this.x = x;
 		//this.y = y;
@@ -25,7 +25,7 @@ public class FlameParticle {
 		colorR = 180;
 		colorG = 160;
 		colorB = 10;
-		alpha = 255;
+		this.alpha = 255;
 		dead = false;
 	}
 
@@ -78,8 +78,8 @@ public class FlameParticle {
 		}		
 	}
 	
-	public void setAlpha(int alpha) {
-		this.alpha = alpha;
+	public void decAlpha(int dec) {
+		this.alpha = alpha - dec;
 	}
 
 }

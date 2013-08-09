@@ -30,7 +30,7 @@ public class Flame {
 
 		for (int i = 0; i < MAX_FLAME_PARTICLES; i++) {
 			flameParticles.add(new FlameParticle(p, pos.x, pos.y, p.random(-2,
-					2), -3));
+					2), -3, 255));
 		}
 
 		//System.out.println(ppos);
@@ -43,7 +43,7 @@ public class Flame {
 			//System.out.println("TRUE");
 			for (int i = 0; i < ADD_MAX_FLAME_PARTICLE; i++) {
 				flameParticles.add(new FlameParticle(p, pos.x, pos.y, p.random(
-						-4, 4), -6));
+						-4, 4), -6, 255));
 
 			}
 		}
@@ -51,10 +51,14 @@ public class Flame {
 		//System.out.println(flameParticles.size());
 	}
 	
-	public void kill(PVector pos) {
-		for(FlameParticle flPart : flameParticles) {
-			flPart.setAlpha(0);
+	public void kill(PVector pos, int intens) {
+		for (int i = 0; i < intens - 2; i++) {
+			flameParticles.add(new FlameParticle(p, pos.x, pos.y, p.random(-2,
+					2), -3, 100));
 		}
+		/*for(FlameParticle flPart : flameParticles) {
+			flPart.decAlpha(100);
+		}*/
 	}
 
 	public void draw(PGraphics pg) {
