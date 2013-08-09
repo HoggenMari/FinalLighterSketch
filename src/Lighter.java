@@ -1,8 +1,7 @@
 import processing.core.PVector;
 
-
 public class Lighter {
-	
+
 	private int lighterID;
 
 	static int MAX_X = 1023;
@@ -16,75 +15,77 @@ public class Lighter {
 	private State lighterState;
 
 	private int delay;
-	
+
 	public enum State {
 		IDLE, INIT, ACTIVE, LOST
 	}
 
-
-	public Lighter(int lighterID, PVector size, int delay){
+	public Lighter(int lighterID, PVector size, int delay) {
 		this.lighterID = lighterID;
-		this.pos = new PVector(1023,1023);
+		this.pos = new PVector(1023, 1023);
 		this.size = size;
 		lighterState = State.IDLE;
 		this.delay = delay;
 	}
-	
-	public void setPosition(PVector pos){
-		//Save previous Position
+
+	public void setPosition(PVector pos) {
+		// Save previous Position
 		ppos = this.pos;
-		
-		//Normalize & Save new position
-		pos.x = (pos.x/MAX_X)*size.x;
-		pos.y = (pos.y/MAX_Y)*size.y;
+
+		// Normalize & Save new position
+		pos.x = (pos.x / MAX_X) * size.x;
+		pos.y = (pos.y / MAX_Y) * size.y;
 		this.pos = pos;
-		
+
 		/*
 		 * Change Lighter States
 		 */
-		//IDLE -> INIT
-		if(lighterState == State.IDLE && pos.x != size.x && pos.y != size.y) {
+		// IDLE -> INIT
+		if (lighterState == State.IDLE && pos.x != size.x && pos.y != size.y) {
 			initPos = pos;
 			lighterState = State.INIT;
 			System.out.println("FLANKENWECHSEL");
-			lostCounter=delay;
-			lostPos=pos;
+			lostCounter = delay;
+			lostPos = pos;
 		}
-		//ACTIVE -> ACTIVE
-		else if(lighterState == State.ACTIVE && pos.x != size.x && pos.y != size.y) {
+		// ACTIVE -> ACTIVE
+		else if (lighterState == State.ACTIVE && pos.x != size.x
+				&& pos.y != size.y) {
 			lostPos = pos;
 			lighterState = State.ACTIVE;
 			System.out.println("AKTIV");
-			lostCounter=delay;
+			lostCounter = delay;
 			System.out.println(lostPos);
 		}
-		//ACTIVE -> LOST
-		else if(lighterState == State.ACTIVE && pos.x == size.x && pos.y == size.y){
+		// ACTIVE -> LOST
+		else if (lighterState == State.ACTIVE && pos.x == size.x
+				&& pos.y == size.y) {
 			lighterState = State.LOST;
 			System.out.println("LOST");
 		}
-		//LOST -> IDLE
-		else if(lighterState == State.LOST && pos.x == size.x && pos.y == size.y){
-			if (lostCounter>0) {
+		// LOST -> IDLE
+		else if (lighterState == State.LOST && pos.x == size.x
+				&& pos.y == size.y) {
+			if (lostCounter > 0) {
 				lostCounter--;
-			} else { 
+			} else {
 				lighterState = State.IDLE;
 				System.out.println("REMOVE");
 			}
 		}
-		//LOST -> ACTIVE
-		else if(lighterState == State.LOST && pos.x != size.x && pos.y != size.y){
-				lighterState = State.ACTIVE;
-				lostCounter=delay;
-				System.out.println("LOST->ACTIVE");
+		// LOST -> ACTIVE
+		else if (lighterState == State.LOST && pos.x != size.x
+				&& pos.y != size.y) {
+			lighterState = State.ACTIVE;
+			lostCounter = delay;
+			System.out.println("LOST->ACTIVE");
 		}
 	}
-	
-	
+
 	@Override
 	public String toString() {
-		return "Lighter [lighterID=" + lighterID + ", posX=" + pos.x + ", posY="
-				+ pos.y + "]";
+		return "Lighter [lighterID=" + lighterID + ", posX=" + pos.x
+				+ ", posY=" + pos.y + "]";
 	}
 
 	public PVector getPos() {
@@ -102,7 +103,7 @@ public class Lighter {
 	public void setPpos(PVector ppos) {
 		this.ppos = ppos;
 	}
-	
+
 	public int getLighterID() {
 		return lighterID;
 	}
@@ -126,6 +127,5 @@ public class Lighter {
 	public int getLostCounter() {
 		return lostCounter;
 	}
-
 
 }

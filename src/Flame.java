@@ -33,14 +33,14 @@ public class Flame {
 					2), -3, 255));
 		}
 
-		//System.out.println(ppos);
-		//System.out.println(pos);
+		// System.out.println(ppos);
+		// System.out.println(pos);
 
 		if (ppos.x == pos.x && ppos.y == pos.y) {
-			if(ADD_MAX_FLAME_PARTICLE < 5) {
-			ADD_MAX_FLAME_PARTICLE += 1;
+			if (ADD_MAX_FLAME_PARTICLE < 5) {
+				ADD_MAX_FLAME_PARTICLE += 1;
 			}
-			//System.out.println("TRUE");
+			// System.out.println("TRUE");
 			for (int i = 0; i < ADD_MAX_FLAME_PARTICLE; i++) {
 				flameParticles.add(new FlameParticle(p, pos.x, pos.y, p.random(
 						-4, 4), -6, 255));
@@ -48,21 +48,21 @@ public class Flame {
 			}
 		}
 
-		//System.out.println(flameParticles.size());
+		// System.out.println(flameParticles.size());
 	}
-	
+
 	public void kill(PVector pos, int intens) {
 		for (int i = 0; i < intens - 2; i++) {
 			flameParticles.add(new FlameParticle(p, pos.x, pos.y, p.random(-2,
 					2), -3, 100));
 		}
-		/*for(FlameParticle flPart : flameParticles) {
-			flPart.decAlpha(100);
-		}*/
+		/*
+		 * for(FlameParticle flPart : flameParticles) { flPart.decAlpha(100); }
+		 */
 	}
 
 	public void draw(PGraphics pg) {
-		//System.out.println("DRAW FLAME");
+		// System.out.println("DRAW FLAME");
 		// pg.colorMode(PConstants.RGB);
 
 		pg.beginDraw();

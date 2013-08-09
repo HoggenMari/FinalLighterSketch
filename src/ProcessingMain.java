@@ -14,26 +14,29 @@ public class ProcessingMain extends PApplet {
 	 * Parameter Settings Start
 	 */
 
-	boolean serial = true;
-	boolean screenOut = true;
+	static final boolean SERIAL = false;
+	static final boolean SCREEN = false;
+	static final String ARDUINO_DEVICE = "/dev/tty.usbmodem1a1211";
 
 	/*
 	 * Parameter Settings End
 	 */
 
 	private static final long serialVersionUID = 1L;
-	int lf = 10; // Linefeed in ASCII
-	String myString = null;
+	static int lf = 10; // Linefeed in ASCII
+	String myString = null; //Serial Output String
 	Serial myPort; // Serial port you are using
-	int num[];
+	
 	private LEDScreen ledScreen1;
 	private LEDWall ledWall;
+	
 	private ArrayList<Lighter> lighterList;
-	private PGraphics pg;
 	private ArrayList<Firework> firework;
 	private ArrayList<Flame> flames;
 
-	Flame flame = new Flame(this, 100);
+	private PGraphics pg;
+
+	Flame mouseFlame;
 
 	public void setup() {
 
@@ -51,7 +54,8 @@ public class ProcessingMain extends PApplet {
 		// LighterList initialisieren
 		lighterList = new ArrayList<Lighter>();
 		for (int i = 0; i < 4; i++) {
-			lighterList.add(new Lighter(i, new PVector(pg.width, pg.height), 15));
+			lighterList
+					.add(new Lighter(i, new PVector(pg.width, pg.height), 15));
 		}
 
 		// Firework initialisiren
@@ -61,15 +65,18 @@ public class ProcessingMain extends PApplet {
 		flames = new ArrayList<Flame>();
 
 		// Serial Arduino initialisieren
-		if(serial){
-		/*
-		 * for (int i = 0; i < Serial.list().length; i++) {
-		 * System.out.println("Device " + i + " " + Serial.list()[i]); }
-		 */
-		myPort = new Serial(this, Serial.list()[4], 9600);
-		myPort.clear();
+		if (SERIAL) {
+			
+			  for (int i = 0; i < Serial.list().length; i++) {
+			  System.out.println("Device " + i + " " + Serial.list()[i]); }
+			 
+			myPort = new Serial(this, ARDUINO_DEVICE, 9600);
+			myPort.clear();
 		}
 		
+		//Flame with mouse for testing
+		mouseFlame = new Flame(this, 100);
+
 		// GUI
 		size(200, 400);
 		background(0);
@@ -85,11 +92,11 @@ public class ProcessingMain extends PApplet {
 		image(img1, 0, 0);
 
 		// Ausgabe fŸr LEDScreen
-		if(screenOut){
-		img1.resize(10, 24);
-		ledScreen1.update(img1);
-		ledScreen1.drawOnGui(210, 5);
-		ledWall.sendDMX();
+		if (SCREEN) {
+			img1.resize(10, 24);
+			ledScreen1.update(img1);
+			ledScreen1.drawOnGui(210, 5);
+			ledWall.sendDMX();
 		}
 
 	}
@@ -104,9 +111,9 @@ public class ProcessingMain extends PApplet {
 				firework.add(new Firework(this, pg, lg.getPos(), new Color(
 						(int) random(0, 255), 255, 255), new Color(
 						(int) random(0, 255), 255, 255), lg.getLighterID()));
-				//System.out.println("MAIN - INIT");
+				// System.out.println("MAIN - INIT");
 				lg.setLighterState(Lighter.State.ACTIVE);
-				System.out.println("LighterID: "+lg.getLighterID());
+				System.out.println("LighterID: " + lg.getLighterID());
 			}
 
 			if (lg.getLighterState().toString() == "ACTIVE") {
@@ -115,7 +122,7 @@ public class ProcessingMain extends PApplet {
 						fwWithID = true;
 					}
 				}
-				//System.out.println("MAIN - ACTIVE");
+				// System.out.println("MAIN - ACTIVE");
 				if (!fwWithID) {
 					firework.add(new Firework(this, pg, lg.getInitPos(),
 							new Color((int) random(0, 255), 255, 255), lg
@@ -143,24 +150,24 @@ public class ProcessingMain extends PApplet {
 		// Lighter Flame
 		for (Lighter lg : lighterList) {
 			if (lg.getLighterState().toString() == "INIT") {
-				//System.out.println("!!!!!INIT!!!!!");
+				// System.out.println("!!!!!INIT!!!!!");
 				Flame flame = new Flame(this, lg.getLighterID());
 				flame.update(lg.getPos());
 				flames.add(flame);
 				lg.setLighterState(Lighter.State.ACTIVE);
 			} else if (lg.getLighterState().toString() == "ACTIVE") {
-				//System.out.println("!!!!!ACTIVE!!!!!");
+				// System.out.println("!!!!!ACTIVE!!!!!");
 				for (Flame fl : flames) {
-					if(fl.getFlameID()==lg.getLighterID()) {
+					if (fl.getFlameID() == lg.getLighterID()) {
 						fl.update(lg.getPos());
 						fl.draw(pg);
 					}
 				}
 			} else if (lg.getLighterState().toString() == "LOST") {
-				//System.out.println("!!!!!LOST!!!!!");
+				// System.out.println("!!!!!LOST!!!!!");
 				for (Flame fl : flames) {
-					if(fl.getFlameID()==lg.getLighterID()) {
-						//fl.update(lg.getLostPos());
+					if (fl.getFlameID() == lg.getLighterID()) {
+						// fl.update(lg.getLostPos());
 						System.out.println("!!!!!LOST!!!!!");
 						fl.kill(lg.getLostPos(), lg.getLostCounter());
 						fl.draw(pg);
@@ -179,8 +186,7 @@ public class ProcessingMain extends PApplet {
 		}
 
 		// Mouse Flame
-		//for(Flame fl : flames) { fl.update(new PVector(mouseX, mouseY)); }
-		
+		mouseFlame.update(new PVector(mouseX, mouseY));
 
 		// Draw all Flames
 		for (Iterator<Flame> flameItr = flames.iterator(); flameItr.hasNext();) {
@@ -198,8 +204,8 @@ public class ProcessingMain extends PApplet {
 				new Color((int) random(0, 255), 255, 255), new Color(
 						(int) random(0, 255), 255, 255), 100));
 
-		flame.update(new PVector(mouseX, mouseY));
-		flames.add(flame);
+		mouseFlame.update(new PVector(mouseX, mouseY));
+		flames.add(mouseFlame);
 
 	}
 
