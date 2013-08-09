@@ -77,5 +77,9 @@ public class FlameParticle {
 			pg.popMatrix();
 		}		
 	}
+	
+	public void setAlpha(int alpha) {
+		this.alpha = alpha;
+	}
 
 }

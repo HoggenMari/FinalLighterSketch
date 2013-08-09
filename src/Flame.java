@@ -50,6 +50,12 @@ public class Flame {
 
 		//System.out.println(flameParticles.size());
 	}
+	
+	public void kill(PVector pos) {
+		for(FlameParticle flPart : flameParticles) {
+			flPart.setAlpha(0);
+		}
+	}
 
 	public void draw(PGraphics pg) {
 		//System.out.println("DRAW FLAME");

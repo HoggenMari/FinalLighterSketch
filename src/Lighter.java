@@ -10,9 +10,6 @@ public class Lighter {
 	int lostCounter = 0;
 
 	private PVector pos, ppos, initPos, lostPos;
-	public PVector getLostPos() {
-		return lostPos;
-	}
 
 	private PVector size;
 
@@ -48,26 +45,35 @@ public class Lighter {
 			lighterState = State.INIT;
 			System.out.println("FLANKENWECHSEL");
 			lostCounter=0;
+			lostPos=pos;
 		}
-		//INIT -> ACTIVE
-		else if(lighterState == State.INIT && pos.x != size.x && pos.y != size.y) {
+		//ACTIVE -> ACTIVE
+		else if(lighterState == State.ACTIVE && pos.x != size.x && pos.y != size.y) {
 			lostPos = pos;
 			lighterState = State.ACTIVE;
 			System.out.println("AKTIV");
 			lostCounter=0;
+			System.out.println(lostPos);
 		}
 		//ACTIVE -> LOST
 		else if(lighterState == State.ACTIVE && pos.x == size.x && pos.y == size.y){
 			lighterState = State.LOST;
+			System.out.println("LOST");
 		}
 		//LOST -> IDLE
 		else if(lighterState == State.LOST && pos.x == size.x && pos.y == size.y){
-			if (lostCounter<10) {
+			if (lostCounter<50) {
 				lostCounter++;
 			} else { 
 				lighterState = State.IDLE;
 				System.out.println("REMOVE");
 			}
+		}
+		//LOST -> ACTIVE
+		else if(lighterState == State.LOST && pos.x != size.x && pos.y != size.y){
+				lighterState = State.ACTIVE;
+				lostCounter=0;
+				System.out.println("LOST->ACTIVE");
 		}
 	}
 	
@@ -110,6 +116,9 @@ public class Lighter {
 		this.lighterState = lighterState;
 	}
 
+	public PVector getLostPos() {
+		return lostPos;
+	}
 
 
 }

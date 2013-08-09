@@ -14,8 +14,8 @@ public class ProcessingMain extends PApplet {
 	 * Parameter Settings Start
 	 */
 
-	boolean serial = false;
-	boolean screenOut = false;
+	boolean serial = true;
+	boolean screenOut = true;
 
 	/*
 	 * Parameter Settings End
@@ -80,7 +80,7 @@ public class ProcessingMain extends PApplet {
 
 		background(0);
 
-		// PImage img1 = drawFirework();
+		//PImage img1 = drawFirework();
 		PImage img1 = drawFlame();
 		image(img1, 0, 0);
 
@@ -104,8 +104,9 @@ public class ProcessingMain extends PApplet {
 				firework.add(new Firework(this, pg, lg.getPos(), new Color(
 						(int) random(0, 255), 255, 255), new Color(
 						(int) random(0, 255), 255, 255), lg.getLighterID()));
-				System.out.println("MAIN - INIT");
+				//System.out.println("MAIN - INIT");
 				lg.setLighterState(Lighter.State.ACTIVE);
+				System.out.println("LighterID: "+lg.getLighterID());
 			}
 
 			if (lg.getLighterState().toString() == "ACTIVE") {
@@ -114,7 +115,7 @@ public class ProcessingMain extends PApplet {
 						fwWithID = true;
 					}
 				}
-				System.out.println("MAIN - ACTIVE");
+				//System.out.println("MAIN - ACTIVE");
 				if (!fwWithID) {
 					firework.add(new Firework(this, pg, lg.getInitPos(),
 							new Color((int) random(0, 255), 255, 255), lg
@@ -142,22 +143,27 @@ public class ProcessingMain extends PApplet {
 		// Lighter Flame
 		for (Lighter lg : lighterList) {
 			if (lg.getLighterState().toString() == "INIT") {
-				System.out.println("!!!!!INIT!!!!!");
+				//System.out.println("!!!!!INIT!!!!!");
 				Flame flame = new Flame(this, lg.getLighterID());
 				flame.update(lg.getPos());
 				flames.add(flame);
 				lg.setLighterState(Lighter.State.ACTIVE);
 			} else if (lg.getLighterState().toString() == "ACTIVE") {
-				System.out.println("!!!!!ACTIVE!!!!!");
+				//System.out.println("!!!!!ACTIVE!!!!!");
 				for (Flame fl : flames) {
-					fl.update(lg.getPos());
-					fl.draw(pg);
+					if(fl.getFlameID()==lg.getLighterID()) {
+						fl.update(lg.getPos());
+						fl.draw(pg);
+					}
 				}
 			} else if (lg.getLighterState().toString() == "LOST") {
-				System.out.println("!!!!!LOST!!!!!");
+				//System.out.println("!!!!!LOST!!!!!");
 				for (Flame fl : flames) {
-					fl.update(lg.getInitPos());
-					fl.draw(pg);
+					if(fl.getFlameID()==lg.getLighterID()) {
+						//fl.update(lg.getLostPos());
+						fl.kill(lg.getLostPos());
+						fl.draw(pg);
+					}
 				}
 			} else if (lg.getLighterState().toString() == "IDLE") {
 				for (Iterator<Flame> flameItr = flames.iterator(); flameItr
@@ -165,7 +171,6 @@ public class ProcessingMain extends PApplet {
 					Flame fl = flameItr.next();
 					if (lg.getLighterID() == fl.getFlameID()) {
 						System.out.println("!!!!!REMOVE!!!!!");
-
 						flameItr.remove();
 					}
 				}
@@ -173,7 +178,7 @@ public class ProcessingMain extends PApplet {
 		}
 
 		// Mouse Flame
-		for(Flame fl : flames) { fl.update(new PVector(mouseX, mouseY)); }
+		//for(Flame fl : flames) { fl.update(new PVector(mouseX, mouseY)); }
 		
 
 		// Draw all Flames
