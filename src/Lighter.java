@@ -44,7 +44,7 @@ public class Lighter {
 		if (lighterState == State.IDLE && pos.x != size.x && pos.y != size.y) {
 			initPos = pos;
 			lighterState = State.INIT;
-			System.out.println("FLANKENWECHSEL");
+			//System.out.println("FLANKENWECHSEL");
 			lostCounter = delay;
 			lostPos = pos;
 		}
@@ -53,15 +53,15 @@ public class Lighter {
 				&& pos.y != size.y) {
 			lostPos = pos;
 			lighterState = State.ACTIVE;
-			System.out.println("AKTIV");
+			//System.out.println("AKTIV");
 			lostCounter = delay;
-			System.out.println(lostPos);
+			//System.out.println(lostPos);
 		}
 		// ACTIVE -> LOST
 		else if (lighterState == State.ACTIVE && pos.x == size.x
 				&& pos.y == size.y) {
 			lighterState = State.LOST;
-			System.out.println("LOST");
+			//System.out.println("LOST");
 		}
 		// LOST -> IDLE
 		else if (lighterState == State.LOST && pos.x == size.x
@@ -70,7 +70,7 @@ public class Lighter {
 				lostCounter--;
 			} else {
 				lighterState = State.IDLE;
-				System.out.println("REMOVE");
+				//System.out.println("REMOVE");
 			}
 		}
 		// LOST -> ACTIVE
@@ -78,7 +78,7 @@ public class Lighter {
 				&& pos.y != size.y) {
 			lighterState = State.ACTIVE;
 			lostCounter = delay;
-			System.out.println("LOST->ACTIVE");
+			//System.out.println("LOST->ACTIVE");
 		}
 	}
 

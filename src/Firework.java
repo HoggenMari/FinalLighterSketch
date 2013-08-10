@@ -96,7 +96,7 @@ public class Firework {
 
 		//paint tail
 		if (y > pos.y) {
-			y += -8;
+			y += -100;
 			x += p.random(-1, 1);
 			pg.noStroke();
 			pg.fill(0, 0, 255);

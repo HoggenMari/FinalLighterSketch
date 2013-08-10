@@ -14,8 +14,9 @@ public class ProcessingMain extends PApplet {
 	 * Parameter Settings Start
 	 */
 
-	static final boolean SERIAL = false;
-	static final boolean SCREEN = false;
+	static final boolean SERIAL = true;
+	static final boolean SCREEN = true;
+	static final boolean GAME = true;
 	static final String ARDUINO_DEVICE = "/dev/tty.usbmodem1a1211";
 
 	/*
@@ -37,6 +38,7 @@ public class ProcessingMain extends PApplet {
 	private PGraphics pg;
 
 	Flame mouseFlame;
+	private Game game;
 
 	public void setup() {
 
@@ -76,6 +78,9 @@ public class ProcessingMain extends PApplet {
 		
 		//Flame with mouse for testing
 		mouseFlame = new Flame(this, 100);
+		
+		//Game initialisieren
+		game = new Game(this, pg, 10.0);
 
 		// GUI
 		size(200, 400);
@@ -87,8 +92,8 @@ public class ProcessingMain extends PApplet {
 
 		background(0);
 
-		//PImage img1 = drawFirework();
-		PImage img1 = drawFlame();
+		PImage img1 = drawFirework();
+		//PImage img1 = drawFlame();
 		image(img1, 0, 0);
 
 		// Ausgabe für LEDScreen
@@ -116,10 +121,11 @@ public class ProcessingMain extends PApplet {
 				System.out.println("LighterID: " + lg.getLighterID());
 			}
 
-			if (lg.getLighterState().toString() == "ACTIVE") {
+			if (lg.getLighterState().toString() == "ACTIVE" || lg.getLighterState().toString() == "LOST") {
 				for (Firework fw : firework) {
 					if (fw.getId() == lg.getLighterID()) {
 						fwWithID = true;
+						System.out.println("WARTE");
 					}
 				}
 				// System.out.println("MAIN - ACTIVE");
@@ -127,10 +133,13 @@ public class ProcessingMain extends PApplet {
 					firework.add(new Firework(this, pg, lg.getInitPos(),
 							new Color((int) random(0, 255), 255, 255), lg
 									.getLighterID()));
+					System.out.println("GO");
 				}
 			}
 
 		}
+		
+
 
 		for (Iterator<Firework> fireItr = firework.iterator(); fireItr
 				.hasNext();) {
@@ -140,6 +149,10 @@ public class ProcessingMain extends PApplet {
 			} else
 				fw.draw();
 		}
+		
+		//Draw tokens
+		game.update(lighterList);
+		game.draw();
 
 		PImage img = pg.get();
 		return img;
@@ -168,7 +181,7 @@ public class ProcessingMain extends PApplet {
 				for (Flame fl : flames) {
 					if (fl.getFlameID() == lg.getLighterID()) {
 						// fl.update(lg.getLostPos());
-						System.out.println("!!!!!LOST!!!!!");
+						//System.out.println("!!!!!LOST!!!!!");
 						fl.kill(lg.getLostPos(), lg.getLostCounter());
 						fl.draw(pg);
 					}
@@ -178,7 +191,7 @@ public class ProcessingMain extends PApplet {
 						.hasNext();) {
 					Flame fl = flameItr.next();
 					if (lg.getLighterID() == fl.getFlameID()) {
-						System.out.println("!!!!!REMOVE!!!!!");
+						//System.out.println("!!!!!REMOVE!!!!!");
 						flameItr.remove();
 					}
 				}
@@ -188,11 +201,16 @@ public class ProcessingMain extends PApplet {
 		// Mouse Flame
 		mouseFlame.update(new PVector(mouseX, mouseY));
 
+		//Draw tokens
+		game.update(lighterList);
+		game.draw();
+		
 		// Draw all Flames
 		for (Iterator<Flame> flameItr = flames.iterator(); flameItr.hasNext();) {
 			Flame fl = flameItr.next();
 			fl.draw(pg);
 		}
+		
 
 		PImage img = pg.get();
 		return img;
