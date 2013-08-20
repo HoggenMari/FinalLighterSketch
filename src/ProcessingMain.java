@@ -16,8 +16,8 @@ public class ProcessingMain extends PApplet {
 
 	static final boolean SERIAL = true;
 	static final boolean SCREEN = true;
-	static final boolean GAME = true;
-	static final String ARDUINO_DEVICE = "/dev/tty.usbmodem1a1211";
+	static final boolean GAME = false;
+	static final String ARDUINO_DEVICE = "/dev/tty.usbmodem1d1211";
 
 	/*
 	 * Parameter Settings End
@@ -25,12 +25,12 @@ public class ProcessingMain extends PApplet {
 
 	private static final long serialVersionUID = 1L;
 	static int lf = 10; // Linefeed in ASCII
-	String myString = null; //Serial Output String
+	String myString = null; // Serial Output String
 	Serial myPort; // Serial port you are using
-	
+
 	private LEDScreen ledScreen1;
 	private LEDWall ledWall;
-	
+
 	private ArrayList<Lighter> lighterList;
 	private ArrayList<Firework> firework;
 	private ArrayList<Flame> flames;
@@ -42,11 +42,11 @@ public class ProcessingMain extends PApplet {
 
 	public void setup() {
 
-		pg = createGraphics(200, 400);
+		pg = createGraphics(360, 240);
 		pg.colorMode(HSB);
 
 		// LEDScreen1 initialisieren
-		ledScreen1 = new LEDScreen(10, 24, this);
+		ledScreen1 = new LEDScreen(36, 24, this);
 
 		// LEDWall initialisieren
 		ledWall = new LEDWall(this);
@@ -68,39 +68,47 @@ public class ProcessingMain extends PApplet {
 
 		// Serial Arduino initialisieren
 		if (SERIAL) {
+
+			for (int i = 0; i < Serial.list().length; i++) {
+				System.out.println("Device " + i + " " + Serial.list()[i]);
+			}
 			
-			  for (int i = 0; i < Serial.list().length; i++) {
-			  System.out.println("Device " + i + " " + Serial.list()[i]); }
-			 
-			myPort = new Serial(this, ARDUINO_DEVICE, 9600);
-			myPort.clear();
+			try {
+				myPort = new Serial(this, Serial.list()[4], 9600);
+				myPort.clear();
+			} catch (Exception e) {
+				System.out.println("Serial konnte nicht initialisiert werden");
+			}
 		}
-		
-		//Flame with mouse for testing
+
+		// Flame with mouse for testing
 		mouseFlame = new Flame(this, 100);
-		
-		//Game initialisieren
-		game = new Game(this, pg, 10.0);
+
+		// Game initialisieren
+		if (GAME) {
+			game = new Game(this, pg, 10.0);
+		}
 
 		// GUI
 		size(200, 400);
-		background(0);
+		background(255);
 
 	}
 
 	public void draw() {
 
-		background(0);
+		background(255);
 
 		PImage img1 = drawFirework();
-		//PImage img1 = drawFlame();
-		image(img1, 0, 0);
+		// PImage img1 = drawFlame();
+		// img1 = rotate(img1);
+		image(img1, 5, 5);
 
 		// Ausgabe fŸr LEDScreen
 		if (SCREEN) {
-			img1.resize(10, 24);
+			img1.resize(36, 24);
 			ledScreen1.update(img1);
-			ledScreen1.drawOnGui(210, 5);
+			ledScreen1.drawOnGui(250, 5);
 			ledWall.sendDMX();
 		}
 
@@ -121,7 +129,8 @@ public class ProcessingMain extends PApplet {
 				System.out.println("LighterID: " + lg.getLighterID());
 			}
 
-			if (lg.getLighterState().toString() == "ACTIVE" || lg.getLighterState().toString() == "LOST") {
+			if (lg.getLighterState().toString() == "ACTIVE"
+					|| lg.getLighterState().toString() == "LOST") {
 				for (Firework fw : firework) {
 					if (fw.getId() == lg.getLighterID()) {
 						fwWithID = true;
@@ -138,8 +147,6 @@ public class ProcessingMain extends PApplet {
 			}
 
 		}
-		
-
 
 		for (Iterator<Firework> fireItr = firework.iterator(); fireItr
 				.hasNext();) {
@@ -149,10 +156,12 @@ public class ProcessingMain extends PApplet {
 			} else
 				fw.draw();
 		}
-		
-		//Draw tokens
-		game.update(lighterList);
-		game.draw();
+
+		// Draw tokens
+		if (GAME) {
+			game.update(lighterList);
+			game.draw();
+		}
 
 		PImage img = pg.get();
 		return img;
@@ -181,7 +190,7 @@ public class ProcessingMain extends PApplet {
 				for (Flame fl : flames) {
 					if (fl.getFlameID() == lg.getLighterID()) {
 						// fl.update(lg.getLostPos());
-						//System.out.println("!!!!!LOST!!!!!");
+						// System.out.println("!!!!!LOST!!!!!");
 						fl.kill(lg.getLostPos(), lg.getLostCounter());
 						fl.draw(pg);
 					}
@@ -191,7 +200,7 @@ public class ProcessingMain extends PApplet {
 						.hasNext();) {
 					Flame fl = flameItr.next();
 					if (lg.getLighterID() == fl.getFlameID()) {
-						//System.out.println("!!!!!REMOVE!!!!!");
+						// System.out.println("!!!!!REMOVE!!!!!");
 						flameItr.remove();
 					}
 				}
@@ -201,16 +210,17 @@ public class ProcessingMain extends PApplet {
 		// Mouse Flame
 		mouseFlame.update(new PVector(mouseX, mouseY));
 
-		//Draw tokens
-		game.update(lighterList);
-		game.draw();
-		
+		// Draw tokens
+		if (GAME) {
+			game.update(lighterList);
+			game.draw();
+		}
+
 		// Draw all Flames
 		for (Iterator<Flame> flameItr = flames.iterator(); flameItr.hasNext();) {
 			Flame fl = flameItr.next();
 			fl.draw(pg);
 		}
-		
 
 		PImage img = pg.get();
 		return img;
@@ -230,21 +240,25 @@ public class ProcessingMain extends PApplet {
 	// Arduino LighterProtocoll: "posX,posY"-items split with ',' - tuples split
 	// with ':' - end of 4 tuples is '\n'
 	public void serialEvent(Serial myPort) {
-		myString = myPort.readStringUntil(lf);
-		if (myString != null) {
-			String[] spl1 = split(myString, '\n');
-			spl1 = split(spl1[0], ':');
+		try {
+			myString = myPort.readStringUntil(lf);
+			if (myString != null) {
+				String[] spl1 = split(myString, '\n');
+				spl1 = split(spl1[0], ':');
 
-			for (int i = 0; i < spl1.length; i++) {
-				String[] spl2 = split(spl1[i], ',');
-				if (spl2.length >= 2) {
-					int posX = parseWithDefault(spl2[0], 0);
-					int posY = parseWithDefault(spl2[1], 0);
+				for (int i = 0; i < spl1.length; i++) {
+					String[] spl2 = split(spl1[i], ',');
+					if (spl2.length >= 2) {
+						int posX = parseWithDefault(spl2[0], 0);
+						int posY = parseWithDefault(spl2[1], 0);
 
-					// Set new position of the Lighters
-					lighterList.get(i).setPosition(new PVector(posX, posY));
+						// Set new position of the Lighters
+						lighterList.get(i).setPosition(new PVector(posX, posY));
+					}
 				}
 			}
+		} catch (Exception e) {
+			println("Initialization exception");
 		}
 	}
 
@@ -262,6 +276,15 @@ public class ProcessingMain extends PApplet {
 		pg.noStroke();
 		pg.fill(0, trans);
 		pg.rect(0, 0, width, height);
+	}
+
+	PImage rotate(PImage img) {
+		for (int ix = 0; ix < img.width; ix++) {
+			for (int iy = 0; iy < img.height; iy++) {
+				img.set(ix, iy, img.get(iy, ix));
+			}
+		}
+		return img;
 	}
 
 }

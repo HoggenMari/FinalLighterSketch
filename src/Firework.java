@@ -5,7 +5,6 @@ import java.util.Iterator;
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PGraphics;
-import processing.core.PImage;
 import processing.core.PVector;
 
 public class Firework {
@@ -96,7 +95,7 @@ public class Firework {
 
 		//paint tail
 		if (y > pos.y) {
-			y += -100;
+			y += -8;
 			x += p.random(-1, 1);
 			pg.noStroke();
 			pg.fill(0, 0, 255);
@@ -122,8 +121,6 @@ public class Firework {
 
 		pg.endDraw();
 
-		PImage img = pg.get();
-		p.image(img, 0, 0);
 	}
 
 	public boolean isDead() {
