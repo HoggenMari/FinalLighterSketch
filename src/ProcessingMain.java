@@ -7,6 +7,8 @@ import processing.core.PGraphics;
 import processing.core.PImage;
 import processing.core.PVector;
 import processing.serial.*;
+import processing.video.*;
+
 
 public class ProcessingMain extends PApplet {
 
@@ -39,6 +41,7 @@ public class ProcessingMain extends PApplet {
 
 	Flame mouseFlame;
 	private Game game;
+	private Capture cam;
 
 	public void setup() {
 
@@ -92,25 +95,64 @@ public class ProcessingMain extends PApplet {
 		// GUI
 		size(200, 400);
 		background(255);
+		
+		setupCam();
 
 	}
+	
+	public void setupCam() {
+		String[] cameras = Capture.list();
+		  
+		  if (cameras.length == 0) {
+		    println("There are no cameras available for capture.");
+		    exit();
+		  } else {
+		    println("Available cameras:");
+		    for (int i = 0; i < cameras.length; i++) {
+		      println(cameras[i]);
+		    }
+		    
+		    // The camera can be initialized directly using an 
+		    // element from the array returned by list():
+		    cam = new Capture(this, cameras[0]);
+		    cam.start();     
+		  }
+	}
+	
+	PImage drawCam() {
+		  PImage img = new PImage();
+		  if (cam.available() == true) {
+		    cam.read();
+		  }
+		  img = cam.get();
+		  // The following does the same, and is faster when just drawing the image
+		  // without any additional resizing, transformations, or tint.
+		  //set(0, 0, cam);
+		  return img;
+		}
 
 	public void draw() {
 
 		background(255);
 
-		PImage img1 = drawFirework();
+		//PImage img1 = drawFirework();
 		// PImage img1 = drawFlame();
+		PImage img1 = drawCam();
 		// img1 = rotate(img1);
 		image(img1, 5, 5);
 
 		// Ausgabe fŸr LEDScreen
 		if (SCREEN) {
+			try {
 			img1.resize(36, 24);
 			ledScreen1.update(img1);
 			ledScreen1.drawOnGui(250, 5);
 			ledWall.sendDMX();
+			} catch (Exception e) {
+				System.out.println("Fehler");
+			}
 		}
+		
 
 	}
 

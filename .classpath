@@ -10,5 +10,8 @@
 	<classpathentry kind="lib" path="/Users/mariushoggenmuller/Downloads/arduino 2/library/Arduino.jar"/>
 	<classpathentry kind="lib" path="/Users/mariushoggenmuller/Dropbox/Uni/SoSe2013/Bachelor-Arbeit/serial/library/serial.jar"/>
 	<classpathentry kind="lib" path="/Users/mariushoggenmuller/Dropbox/Uni/SoSe2013/Bachelor-Arbeit/serial/library/RXTXcomm.jar"/>
+	<classpathentry kind="lib" path="/Users/mariushoggenmuller/Downloads/video/library/video.jar"/>
+	<classpathentry kind="lib" path="/Users/mariushoggenmuller/Downloads/video/library/gstreamer-java.jar"/>
+	<classpathentry kind="lib" path="/Users/mariushoggenmuller/Downloads/video/library/jna.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
