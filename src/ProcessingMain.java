@@ -42,18 +42,21 @@ public class ProcessingMain extends PApplet {
 	Flame mouseFlame;
 	private Game game;
 	private Capture cam;
+	private LEDScreen ledScreen2;
 
 	public void setup() {
 
-		pg = createGraphics(360, 240);
+		pg = createGraphics(320, 240);
 		pg.colorMode(HSB);
 
 		// LEDScreen1 initialisieren
-		ledScreen1 = new LEDScreen(36, 24, this);
+		ledScreen1 = new LEDScreen(32, 24, this);
+		ledScreen2 = new LEDScreen(32, 24, this);
 
 		// LEDWall initialisieren
 		ledWall = new LEDWall(this);
 		ledWall.add(ledScreen1);
+		ledWall.add(ledScreen2);
 		ledWall.init();
 
 		// LighterList initialisieren
@@ -136,17 +139,22 @@ public class ProcessingMain extends PApplet {
 		background(255);
 
 		//PImage img1 = drawFirework();
-		// PImage img1 = drawFlame();
-		PImage img1 = drawCam();
-		// img1 = rotate(img1);
+		//PImage img1 = drawFlame();
+		//PImage img1 = drawCam();
+		PImage img1 = loadImage("/Users/mariushoggenmuller/Documents/test.png");
+		PImage img2 = loadImage("/Users/mariushoggenmuller/Documents/test2.png");
+		//img1 = rotate(img1);
 		image(img1, 5, 5);
+		image(img2, 5, 40);
 
 		// Ausgabe für LEDScreen
 		if (SCREEN) {
 			try {
-			img1.resize(36, 24);
+			img1.resize(32, 24);
 			ledScreen1.update(img1);
+			ledScreen2.update(img2);
 			ledScreen1.drawOnGui(250, 5);
+			ledScreen2.drawOnGui(250, 200);
 			ledWall.sendDMX();
 			} catch (Exception e) {
 				System.out.println("Fehler");

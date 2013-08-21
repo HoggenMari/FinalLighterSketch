@@ -17,6 +17,7 @@ public class LEDWall {
 	private int NUMBER_OF_CONTROLLERS = 2;
 	private int NUMBER_OF_PORTS_IN_USE = 10;
 	private int PORTS_PR_CONTROLLER = 8;
+	private int[] CONTROLLER_ID = { 1, 4 };
 
 	public LEDWall(PApplet p) {
 		this.p = p;
@@ -32,20 +33,20 @@ public class LEDWall {
 
 	public void sendDMX() {
 
-		byte[] data = new byte[2702];
+		byte[] data = new byte[6000];
 
 		data[0] = 'Y';
 		data[1] = 'T';
 		data[2] = 'K';
 		data[3] = 'J';
 
-		for (int controller = 1; controller <= NUMBER_OF_CONTROLLERS; controller++) {
-			data[4] = (byte) (controller);
+		for (int controller = 0; controller <= NUMBER_OF_CONTROLLERS; controller++) {
+			data[4] = (byte) CONTROLLER_ID[controller];
 			data[5] = 0;
 
 			data[6] = 0x57;
 			data[7] = 0x05;
-			int portsInUse = NUMBER_OF_PORTS_IN_USE - (controller - 1)
+			int portsInUse = NUMBER_OF_PORTS_IN_USE - controller
 					* PORTS_PR_CONTROLLER;
 			if (portsInUse > PORTS_PR_CONTROLLER) {
 				portsInUse = PORTS_PR_CONTROLLER;
@@ -85,7 +86,7 @@ public class LEDWall {
 						dataIndex += 3;
 						ledCounter++;
 
-						//System.out.println("LEDCOUNTER: DOWN"+ledCounter);
+						System.out.println("LEDCOUNTER: DOWN"+ledCounter);
 
 						
 						if (ledCounter >= ledsOnPort) {
@@ -101,14 +102,14 @@ public class LEDWall {
 					}
 					i_x++;
 
-					for (int i_y = screenList.get(screenListIndex).getY()[i_x]; i_y > 0; i_y--) {
+					for (int i_y = screenList.get(screenListIndex).getY()[i_x]-1; i_y >= 0; i_y--) {
 
 						setPixel(i_x, i_y, screenList.get(screenListIndex)
 								.getImage(), data, dataIndex);
 						dataIndex += 3;
 						ledCounter++;
 
-						//System.out.println("LEDCOUNTER UP:"+ledCounter);
+						System.out.println("LEDCOUNTER UP:"+ledCounter);
 						
 							
 						if (ledCounter >= ledsOnPort) {
@@ -167,7 +168,7 @@ public class LEDWall {
 		// }
 	}
 	
-	void newPort(int portCounter, int channel, int ledCounter, int ledsOnPort, byte data[], int dataIndex) {
+	/*void newPort(int portCounter, int channel, int ledCounter, int ledsOnPort, byte data[], int dataIndex) {
 		
 		//portCounter++;
 		//channel += 2048;
@@ -178,6 +179,6 @@ public class LEDWall {
 		data[dataIndex++] = (byte) ((ledsOnPort * 3) & 0xff);
 		data[dataIndex++] = (byte) (((ledsOnPort * 3) >> 8) & 0xff);
 		
-	}
+	}*/
 
 }
