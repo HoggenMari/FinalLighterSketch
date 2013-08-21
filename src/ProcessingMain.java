@@ -139,10 +139,11 @@ public class ProcessingMain extends PApplet {
 		background(255);
 
 		//PImage img1 = drawFirework();
-		//PImage img1 = drawFlame();
+		PImage img1 = drawFlame();
+		PImage img2 = drawFlame();
 		//PImage img1 = drawCam();
-		PImage img1 = loadImage("/Users/mariushoggenmuller/Documents/test.png");
-		PImage img2 = loadImage("/Users/mariushoggenmuller/Documents/test2.png");
+		//PImage img1 = loadImage("/Users/mariushoggenmuller/Documents/test.png");
+		//PImage img2 = loadImage("/Users/mariushoggenmuller/Documents/test2.png");
 		//img1 = rotate(img1);
 		image(img1, 5, 5);
 		image(img2, 5, 40);
