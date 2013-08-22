@@ -3,6 +3,7 @@ import java.util.Iterator;
 
 import processing.core.PApplet;
 import processing.core.PGraphics;
+import processing.core.PImage;
 import processing.core.PVector;
 
 public class Flame {
@@ -61,14 +62,16 @@ public class Flame {
 		 */
 	}
 
-	public void draw(PGraphics pg) {
+	public void draw(PGraphics pg, PImage bg) {
 		// System.out.println("DRAW FLAME");
 		// pg.colorMode(PConstants.RGB);
 
 		pg.beginDraw();
 		pg.noStroke();
-		pg.fill(0, 40);
-		pg.rect(0, 0, p.width, p.height);
+		//pg.fill(0, 120, 120);
+		//PImage bg = p.loadImage("/Users/mariushoggenmuller/Documents/bg.png");
+		pg.set(0, 0, bg);
+		//pg.rect(0, 0, p.width, p.height);
 
 		for (Iterator<FlameParticle> flamePartItr = flameParticles.iterator(); flamePartItr
 				.hasNext();) {

@@ -5,6 +5,7 @@ import java.util.Iterator;
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PGraphics;
+import processing.core.PImage;
 import processing.core.PVector;
 
 public class Firework {
@@ -90,7 +91,7 @@ public class Firework {
 		pg.beginDraw();
 		pg.noStroke();
 		pg.colorMode(PConstants.HSB);
-		pg.fill(0, 40);
+		pg.fill(0,0,0);
 		pg.rect(0, 0, p.width, p.height);
 
 		//paint tail

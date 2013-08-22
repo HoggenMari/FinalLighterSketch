@@ -142,10 +142,10 @@ public class ProcessingMain extends PApplet {
 
 		background(255);
 
-		//PImage img1 = drawFirework();
+		PImage img1 = drawFlame();
 		//PImage img1 = drawFirework();
 		//PImage img2 = drawFirework();
-		PImage img1 = drawCam();
+		//PImage img1 = drawCam();
 		//PImage img1 = loadImage("/Users/mariushoggenmuller/Documents/test.png");
 		//PImage img2 = loadImage("/Users/mariushoggenmuller/Documents/test2.png");
 		//PImage img3 = loadImage("/Users/mariushoggenmuller/Documents/test.png");
@@ -156,7 +156,7 @@ public class ProcessingMain extends PApplet {
 		// Ausgabe für LEDScreen
 		if (SCREEN) {
 			try {
-			img1.resize(32, 24);
+			img1.resize(32, 32);
 			//img2.resize(32, 12);
 			ledScreen1.update(img1);
 			//ledScreen2.update(img2);
@@ -227,6 +227,8 @@ public class ProcessingMain extends PApplet {
 	}
 
 	public PImage drawFlame() {
+		
+		PImage bg = drawCam();
 
 		// Lighter Flame
 		for (Lighter lg : lighterList) {
@@ -241,7 +243,7 @@ public class ProcessingMain extends PApplet {
 				for (Flame fl : flames) {
 					if (fl.getFlameID() == lg.getLighterID()) {
 						fl.update(lg.getPos());
-						fl.draw(pg);
+						fl.draw(pg, bg);
 					}
 				}
 			} else if (lg.getLighterState().toString() == "LOST") {
@@ -251,7 +253,7 @@ public class ProcessingMain extends PApplet {
 						// fl.update(lg.getLostPos());
 						// System.out.println("!!!!!LOST!!!!!");
 						fl.kill(lg.getLostPos(), lg.getLostCounter());
-						fl.draw(pg);
+						fl.draw(pg, bg);
 					}
 				}
 			} else if (lg.getLighterState().toString() == "IDLE") {
@@ -278,7 +280,7 @@ public class ProcessingMain extends PApplet {
 		// Draw all Flames
 		for (Iterator<Flame> flameItr = flames.iterator(); flameItr.hasNext();) {
 			Flame fl = flameItr.next();
-			fl.draw(pg);
+			fl.draw(pg, bg);
 		}
 
 		PImage img = pg.get();
@@ -333,7 +335,7 @@ public class ProcessingMain extends PApplet {
 	// Auxiliary function for Blur-Effect
 	void blur(float trans, PGraphics pg) {
 		pg.noStroke();
-		pg.fill(0, trans);
+		pg.fill(60, trans);
 		pg.rect(0, 0, width, height);
 	}
 
