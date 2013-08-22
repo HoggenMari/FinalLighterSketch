@@ -43,23 +43,23 @@ public class ProcessingMain extends PApplet {
 	private Game game;
 	private Capture cam;
 	private LEDScreen ledScreen2;
-	private LEDScreen ledScreen3;
+	//private LEDScreen ledScreen3;
 
 	public void setup() {
 
-		pg = createGraphics(320, 240);
+		pg = createGraphics(160, 240);
 		pg.colorMode(HSB);
 
 		// LEDScreen1 initialisieren
-		ledScreen1 = new LEDScreen(32, 24, this);
-		ledScreen2 = new LEDScreen(32, 24, this);
+		ledScreen1 = new LEDScreen(16, 24, this);
+		ledScreen2 = new LEDScreen(8, 24, this);
 		//ledScreen3 = new LEDScreen(32, 24, this);
 
 
 		// LEDWall initialisieren
 		ledWall = new LEDWall(this);
-		ledWall.add(ledScreen1);
-		//ledWall.add(ledScreen2, 1);
+		ledWall.add(ledScreen1, 0, LEDWall.NORMAL_MODE);
+		ledWall.add(ledScreen2);
 		//ledWall.add(ledScreen3, 1);
 		ledWall.init();
 
@@ -142,8 +142,8 @@ public class ProcessingMain extends PApplet {
 
 		background(255);
 
-		PImage img1 = drawFlame();
-		//PImage img1 = drawFirework();
+		PImage img1 = drawFirework();
+		PImage img2 = drawFirework();
 		//PImage img2 = drawFirework();
 		//PImage img1 = drawCam();
 		//PImage img1 = loadImage("/Users/mariushoggenmuller/Documents/test.png");
@@ -156,13 +156,13 @@ public class ProcessingMain extends PApplet {
 		// Ausgabe für LEDScreen
 		if (SCREEN) {
 			try {
-			img1.resize(32, 32);
+			img1.resize(16, 24);
 			//img2.resize(32, 12);
 			ledScreen1.update(img1);
-			//ledScreen2.update(img2);
+			ledScreen2.update(img2);
 			//ledScreen3.update(img3);
 			ledScreen1.drawOnGui(250, 5);
-			//ledScreen2.drawOnGui(250, 200);
+			ledScreen2.drawOnGui(250, 200);
 			//ledScreen3.drawOnGui(250, 400);
 			ledWall.sendDMX();
 			} catch (Exception e) {

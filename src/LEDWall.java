@@ -7,8 +7,13 @@ import processing.core.PImage;
 
 public class LEDWall {
 
+	public static final int NORMAL_MODE  = 0;
+	public static final int REVERSE_MODE  = 1;
+
 	ArrayList<LEDScreen> ledScreenList = new ArrayList<LEDScreen>();
 	ArrayList<Integer> controllerList = new ArrayList<Integer>();
+	ArrayList<Integer> modeList = new ArrayList<Integer>();
+	
 	private final String ip = "224.1.1.1";
 	private final int port = 5026;
 	private PApplet p;
@@ -20,7 +25,7 @@ public class LEDWall {
 	private int PORTS_PR_CONTROLLER = 8;
 	private int LEDS_ON_PORT = 96;
 	private int[] CONTROLLER_ID = { 1, 4 };
-
+	
 	public LEDWall(PApplet p) {
 		this.p = p;
 	}
@@ -29,14 +34,22 @@ public class LEDWall {
 		udp = new UDP(p, 5026);
 	}
 
+	public void add(LEDScreen ledScreen, int controllerNum, int mode) {
+		screenList.add(ledScreen);
+		controllerList.add(controllerNum);
+		modeList.add(mode);
+	}
+	
 	public void add(LEDScreen ledScreen, int controllerNum) {
 		screenList.add(ledScreen);
 		controllerList.add(controllerNum);
+		modeList.add(NORMAL_MODE);
 	}
-
+	
 	public void add(LEDScreen ledScreen) {
 		screenList.add(ledScreen);
 		controllerList.add(0);
+		modeList.add(NORMAL_MODE);
 	}
 
 	public void sendDMX() {
@@ -85,7 +98,9 @@ public class LEDWall {
 							+ " SCREENLISTINDEX: " + screenListIndex);
 
 					int ledCounter = 0;
-
+					
+					if(modeList.get(screenListIndex)==NORMAL_MODE) {
+						
 					// iterate x-coordinates
 					for (int i_x = 0; i_x < screenList.get(screenListIndex)
 							.getY().length; i_x++) {
@@ -135,7 +150,58 @@ public class LEDWall {
 							}
 						}
 					}
+					} else {
+					// iterate x-coordinates
+					for (int i_x = screenList.get(screenListIndex)
+							.getY().length - 1; i_x >= 0; i_x--) {
 
+						// iterate y-coordinates i_x (down)
+						for (int i_y = screenList.get(screenListIndex)
+								.getY()[i_x] - 1; i_y >= 0; i_y--) {
+
+							setPixel(i_x, i_y, screenList.get(screenListIndex)
+									.getImage(), data, dataIndex);
+							dataIndex += 3;
+							ledCounter++;
+
+							// open new port if required
+							if (ledCounter >= LEDS_ON_PORT) {
+
+								channel += 2048;
+								ledCounter = 0;
+
+								data[dataIndex++] = (byte) (channel & 0xff);
+								data[dataIndex++] = (byte) ((channel >> 8) & 0xff);
+								data[dataIndex++] = (byte) ((LEDS_ON_PORT * 3) & 0xff);
+								data[dataIndex++] = (byte) (((LEDS_ON_PORT * 3) >> 8) & 0xff);
+							}
+						}
+
+						i_x--;
+
+						// iterate y-coordinates i_x (up)
+						for (int i_y = 0; i_y < screenList.get(screenListIndex).getY()[i_x]; i_y++) {
+
+							setPixel(i_x, i_y, screenList.get(screenListIndex)
+									.getImage(), data, dataIndex);
+							dataIndex += 3;
+							ledCounter++;
+
+							// open new port if required
+							if (ledCounter >= LEDS_ON_PORT) {
+
+								channel += 2048;
+								ledCounter = 0;
+
+								data[dataIndex++] = (byte) (channel & 0xff);
+								data[dataIndex++] = (byte) ((channel >> 8) & 0xff);
+								data[dataIndex++] = (byte) ((LEDS_ON_PORT * 3) & 0xff);
+								data[dataIndex++] = (byte) (((LEDS_ON_PORT * 3) >> 8) & 0xff);
+							}
+						}
+					}
+					}
+					
 					// padding bytes for remaining leds on port
 					int rest;
 					if ((rest = 96 - ledCounter) != 96) {
