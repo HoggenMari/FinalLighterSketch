@@ -51,7 +51,7 @@ public class ProcessingMain extends PApplet {
 
 		// LEDScreen1 initialisieren
 		ledScreen1 = new LEDScreen(32, 24, this);
-		ledScreen2 = new LEDScreen(32, 24, this);
+		ledScreen2 = new LEDScreen(4, 24, this);
 
 		// LEDWall initialisieren
 		ledWall = new LEDWall(this);

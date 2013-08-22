@@ -55,30 +55,9 @@ public class LEDWall {
 			
 			controller = 0;
 		
-			data[4] = (byte) CONTROLLER_ID[controller];
-			data[5] = 0;
+			newController(controller);
 
-			data[6] = 0x57;
-			data[7] = 0x05;
-			int portsInUse = NUMBER_OF_PORTS_IN_USE - controller
-					* PORTS_PR_CONTROLLER;
-			if (portsInUse > PORTS_PR_CONTROLLER) {
-				portsInUse = PORTS_PR_CONTROLLER;
-			}
-
-			System.out.println("Controller: " + controller);
-
-			data[8] = (byte) portsInUse;
-			data[9] = 0;
-
-			dataIndex = 10;
-
-			//System.out.println("blubb: "+controller);
-			//System.out.println("PORTSINUSE :"+portsInUse);
-
-			channel = 0;
-
-			newPort();
+			newPort(globalPortCounter);
 
 			//for (int screenListIndex = 0; screenListIndex < screenList.size(); screenListIndex++) {
 			while(screenListIndex < screenList.size()) {
@@ -102,8 +81,16 @@ public class LEDWall {
 						//System.out.println("LEDCOUNTER: DOWN"+ledCounter);
 
 						//reset ledCounter and increase port
-						if (ledCounter >= LEDS_ON_PORT) {
-							newPort();
+						if (globalPortCounter>=PORTS_PR_CONTROLLER) {
+							udp.send(data, ip, port);
+							System.out.println("increase trial 1 "+globalPortCounter);
+							newController(++controller);
+							globalPortCounter = 0;
+							newPort(globalPortCounter);
+						}
+						else if (ledCounter >= LEDS_ON_PORT) {
+							globalPortCounter++;
+							newPort(globalPortCounter);
 						}
 					}
 					i_x++;
@@ -117,9 +104,17 @@ public class LEDWall {
 
 						//System.out.println("LEDCOUNTER UP:"+ledCounter);
 						
-						//reset ledCounter and increase port	
-						if (ledCounter >= LEDS_ON_PORT) {
-							newPort();
+						//reset ledCounter and increase port
+						if (globalPortCounter>=PORTS_PR_CONTROLLER) {
+							udp.send(data, ip, port);
+							System.out.println("increase trial 1 "+globalPortCounter);
+							newController(++controller);
+							globalPortCounter = 0;
+							newPort(globalPortCounter);
+						}
+						else if (ledCounter >= LEDS_ON_PORT) {
+							globalPortCounter++;
+							newPort(globalPortCounter);
 						}
 					}
 				}
@@ -150,7 +145,7 @@ public class LEDWall {
 
 			// Map the Pixels
 			// udp.send(data, ip, port);
-
+			udp.send(data, ip, port);
 		
 
 	}
@@ -169,9 +164,9 @@ public class LEDWall {
 		// }
 	}
 	
-	void newPort() {
+	void newPort(int port) {
 		
-		if(globalPortCounter<PORTS_PR_CONTROLLER) {
+		//if(globalPortCounter<PORTS_PR_CONTROLLER) {
 		System.out.println("NEW PORT: "+(globalPortCounter % PORTS_PR_CONTROLLER)+" "+globalPortCounter);
 		
 		ledCounter = 0;
@@ -181,10 +176,9 @@ public class LEDWall {
 		data[dataIndex++] = (byte) ((LEDS_ON_PORT * 3) & 0xff);
 		data[dataIndex++] = (byte) (((LEDS_ON_PORT * 3) >> 8) & 0xff);
 		channel += 2048;
-		globalPortCounter++;
 
 
-		}
+		/*}
 		else {
 			udp.send(data, ip, port);
 			System.out.println("SENDED");
@@ -215,10 +209,35 @@ public class LEDWall {
 			dataIndex = 10;
 			channel = 0;
 			
-			newPort();
+			newPort(0);
 			}
-		}
+		}*/
 		
+	}
+	
+	void newController(int controller) {
+		data[4] = (byte) CONTROLLER_ID[controller];
+		data[5] = 0;
+
+		data[6] = 0x57;
+		data[7] = 0x05;
+		int portsInUse = NUMBER_OF_PORTS_IN_USE - controller
+				* PORTS_PR_CONTROLLER;
+		if (portsInUse > PORTS_PR_CONTROLLER) {
+			portsInUse = PORTS_PR_CONTROLLER;
+		}
+
+		System.out.println("Controller: " + controller);
+
+		data[8] = (byte) portsInUse;
+		data[9] = 0;
+
+		dataIndex = 10;
+
+		//System.out.println("blubb: "+controller);
+		//System.out.println("PORTSINUSE :"+portsInUse);
+
+		channel = 0;
 	}
 
 }
