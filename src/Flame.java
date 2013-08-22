@@ -69,7 +69,7 @@ public class Flame {
 		pg.beginDraw();
 		pg.noStroke();
 		//pg.fill(0, 120, 120);
-		//PImage bg = p.loadImage("/Users/mariushoggenmuller/Documents/bg.png");
+		bg = p.loadImage("/Users/mariushoggenmuller/Documents/bg_small.png");
 		pg.set(0, 0, bg);
 		//pg.rect(0, 0, p.width, p.height);
 
