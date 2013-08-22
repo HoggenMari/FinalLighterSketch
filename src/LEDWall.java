@@ -94,8 +94,8 @@ public class LEDWall {
 
 				if (controllerList.get(screenListIndex) == controller) {
 
-					System.out.println("CONTROLLER: " + controller
-							+ " SCREENLISTINDEX: " + screenListIndex);
+					/*System.out.println("CONTROLLER: " + controller
+							+ " SCREENLISTINDEX: " + screenListIndex);*/
 
 					int ledCounter = 0;
 					
@@ -226,7 +226,7 @@ public class LEDWall {
 			}
 
 			// Map the Pixels
-			System.out.println(dataIndex);
+			//System.out.println(dataIndex);
 			udp.send(data, ip, port);
 
 		}
