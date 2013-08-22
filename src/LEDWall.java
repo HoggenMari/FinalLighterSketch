@@ -15,7 +15,7 @@ public class LEDWall {
 	private ArrayList<LEDScreen> screenList = new ArrayList<LEDScreen>();
 
 	private int NUMBER_OF_CONTROLLERS = 2;
-	private int NUMBER_OF_PORTS_IN_USE = 10;
+	private int NUMBER_OF_PORTS_IN_USE = 16;
 	private int PORTS_PR_CONTROLLER = 8;
 	private int LEDS_ON_PORT = 96;
 	private int[] CONTROLLER_ID = { 1, 4 };
@@ -24,6 +24,7 @@ public class LEDWall {
 	private int ledCounter;
 	private int dataIndex;
 	private int globalPortCounter;
+	private int controller;
 
 	public LEDWall(PApplet p) {
 		this.p = p;
@@ -38,6 +39,8 @@ public class LEDWall {
 	}
 
 	public void sendDMX() {
+		
+		System.out.println("SEND");
 
 		data = new byte[6000];
 		int screenListIndex = 0;
@@ -48,7 +51,10 @@ public class LEDWall {
 		data[2] = 'K';
 		data[3] = 'J';
 
-		for (int controller = 0; controller < NUMBER_OF_CONTROLLERS; controller++) {
+		//for (int controller = 0; controller < NUMBER_OF_CONTROLLERS; controller++) {
+			
+			controller = 0;
+		
 			data[4] = (byte) CONTROLLER_ID[controller];
 			data[5] = 0;
 
@@ -60,7 +66,7 @@ public class LEDWall {
 				portsInUse = PORTS_PR_CONTROLLER;
 			}
 
-			//System.out.println("Controller: " + controller);
+			System.out.println("Controller: " + controller);
 
 			data[8] = (byte) portsInUse;
 			data[9] = 0;
@@ -79,7 +85,7 @@ public class LEDWall {
 				
 				ledCounter = 0;
 				
-				//System.out.println("SCREENLISTINDEX: "+screenListIndex+" CONTROLLER: "+controller);
+				System.out.println("SCREENLISTINDEX: "+screenListIndex+" CONTROLLER: "+controller);
 
 				for (int i_x = 0; i_x < screenList.get(screenListIndex).getY().length; i_x++) {
 
@@ -122,6 +128,7 @@ public class LEDWall {
 				//pad rest leds on port
 				int rest = LEDS_ON_PORT-ledCounter;
 				if(rest!=96) {
+					System.out.println("GO");
 					for(int i=0; i<rest; i++) {
 						dataIndex += 3;
 					}
@@ -142,9 +149,9 @@ public class LEDWall {
 			}
 
 			// Map the Pixels
-			udp.send(data, ip, port);
+			// udp.send(data, ip, port);
 
-		}
+		
 
 	}
 
@@ -179,8 +186,37 @@ public class LEDWall {
 
 		}
 		else {
-			System.out.println("Controller increase");
+			udp.send(data, ip, port);
+			System.out.println("SENDED");
+			
+			if(controller<NUMBER_OF_CONTROLLERS-1) {
+			controller++;
+
+			System.out.println("Controller increeeease");
 			globalPortCounter = 0;
+			ledCounter = 0;
+			
+			data[4] = (byte) CONTROLLER_ID[controller];
+			data[5] = 0;
+
+			data[6] = 0x57;
+			data[7] = 0x05;
+			int portsInUse = NUMBER_OF_PORTS_IN_USE - controller
+					* PORTS_PR_CONTROLLER;
+			if (portsInUse > PORTS_PR_CONTROLLER) {
+				portsInUse = PORTS_PR_CONTROLLER;
+			}
+
+			System.out.println("Controller: " + controller);
+
+			data[8] = (byte) portsInUse;
+			data[9] = 0;
+			
+			dataIndex = 10;
+			channel = 0;
+			
+			newPort();
+			}
 		}
 		
 	}

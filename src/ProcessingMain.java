@@ -99,7 +99,7 @@ public class ProcessingMain extends PApplet {
 		size(200, 400);
 		background(255);
 		
-		setupCam();
+		//setupCam();
 
 	}
 	
@@ -140,26 +140,26 @@ public class ProcessingMain extends PApplet {
 
 		//PImage img1 = drawFirework();
 		PImage img1 = drawFlame();
-		PImage img2 = drawFlame();
+		//PImage img2 = drawFlame();
 		//PImage img1 = drawCam();
 		//PImage img1 = loadImage("/Users/mariushoggenmuller/Documents/test.png");
-		//PImage img2 = loadImage("/Users/mariushoggenmuller/Documents/test2.png");
+		PImage img2 = loadImage("/Users/mariushoggenmuller/Documents/test2.png");
 		//img1 = rotate(img1);
 		image(img1, 5, 5);
 		image(img2, 5, 40);
 
 		// Ausgabe für LEDScreen
 		if (SCREEN) {
-			try {
+			//try {
 			img1.resize(32, 24);
 			ledScreen1.update(img1);
 			ledScreen2.update(img2);
 			ledScreen1.drawOnGui(250, 5);
 			ledScreen2.drawOnGui(250, 200);
 			ledWall.sendDMX();
-			} catch (Exception e) {
-				System.out.println("Fehler");
-			}
+			//} catch (Exception e) {
+			//	System.out.println("Fehler");
+			//}
 		}
 		
 
