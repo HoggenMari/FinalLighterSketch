@@ -20,11 +20,6 @@ public class LEDWall {
 	private int PORTS_PR_CONTROLLER = 8;
 	private int LEDS_ON_PORT = 96;
 	private int[] CONTROLLER_ID = { 1, 4 };
-	private byte[] data;
-	private int channel;
-	//private int ledCounter;
-	private int dataIndex;
-	private int globalPortCounter;
 
 	public LEDWall(PApplet p) {
 		this.p = p;
@@ -39,6 +34,11 @@ public class LEDWall {
 		controllerList.add(controllerNum);
 	}
 
+	public void add(LEDScreen ledScreen) {
+		screenList.add(ledScreen);
+		controllerList.add(0);
+	}
+
 	public void sendDMX() {
 
 		byte[] data = new byte[2702];
@@ -47,10 +47,10 @@ public class LEDWall {
 		data[1] = 'T';
 		data[2] = 'K';
 		data[3] = 'J';
-		
 
+		// iterate Controller
 		for (int controller = 0; controller < NUMBER_OF_CONTROLLERS; controller++) {
-			
+
 			int screenListIndex = 0;
 
 			data[4] = (byte) CONTROLLER_ID[controller];
@@ -64,106 +64,95 @@ public class LEDWall {
 				portsInUse = PORTS_PR_CONTROLLER;
 			}
 
-			// System.out.println("Ports: " + portsInUse);
-
 			data[8] = (byte) portsInUse;
 			data[9] = 0;
 
 			int dataIndex = 10;
 
-			//System.out.println("blubb: "+controller);
-			// System.out.println("PORTSINUSE :"+portsInUse);
-
 			int channel = 0;
-			int ledsOnPort = 96;
 
 			data[dataIndex++] = (byte) (channel & 0xff);
 			data[dataIndex++] = (byte) ((channel >> 8) & 0xff);
-			data[dataIndex++] = (byte) ((ledsOnPort * 3) & 0xff);
-			data[dataIndex++] = (byte) (((ledsOnPort * 3) >> 8) & 0xff);
+			data[dataIndex++] = (byte) ((LEDS_ON_PORT * 3) & 0xff);
+			data[dataIndex++] = (byte) (((LEDS_ON_PORT * 3) >> 8) & 0xff);
 
-			while(screenListIndex<screenList.size()) {
-				
-			//for (int screenListIndex = 0; screenListIndex < screenList.size(); screenListIndex++) {
-				
-				if(controllerList.get(screenListIndex) == controller) {
-				
-				System.out.println("CONTROLLER: "+controller+" SCREENLISTINDEX: "+screenListIndex);
+			// iterate screenList
+			while (screenListIndex < screenList.size()) {
 
-				int ledCounter = 0;
+				if (controllerList.get(screenListIndex) == controller) {
 
-				for (int i_x = 0; i_x < screenList.get(screenListIndex).getY().length; i_x++) {
+					System.out.println("CONTROLLER: " + controller
+							+ " SCREENLISTINDEX: " + screenListIndex);
 
-					// System.out.println("PORT:"+port+" SCREENLISTINDEX:"+screenListIndex+" I_X:"+i_x);
+					int ledCounter = 0;
 
-					for (int i_y = 0; i_y < screenList.get(screenListIndex)
-							.getY()[i_x]; i_y++) {
+					// iterate x-coordinates
+					for (int i_x = 0; i_x < screenList.get(screenListIndex)
+							.getY().length; i_x++) {
 
-						setPixel(i_x, i_y, screenList.get(screenListIndex)
-								.getImage(), data, dataIndex);
-						dataIndex += 3;
-						ledCounter++;
+						// iterate y-coordinates i_x (down)
+						for (int i_y = 0; i_y < screenList.get(screenListIndex)
+								.getY()[i_x]; i_y++) {
 
-						//System.out.println("LEDCOUNTER: DOWN"+ledCounter);
+							setPixel(i_x, i_y, screenList.get(screenListIndex)
+									.getImage(), data, dataIndex);
+							dataIndex += 3;
+							ledCounter++;
 
+							// open new port if required
+							if (ledCounter >= LEDS_ON_PORT) {
 
-						if (ledCounter >= ledsOnPort) {
+								channel += 2048;
+								ledCounter = 0;
 
-							channel += 2048;
-							ledCounter = 0;
+								data[dataIndex++] = (byte) (channel & 0xff);
+								data[dataIndex++] = (byte) ((channel >> 8) & 0xff);
+								data[dataIndex++] = (byte) ((LEDS_ON_PORT * 3) & 0xff);
+								data[dataIndex++] = (byte) (((LEDS_ON_PORT * 3) >> 8) & 0xff);
+							}
+						}
 
-							data[dataIndex++] = (byte) (channel & 0xff);
-							data[dataIndex++] = (byte) ((channel >> 8) & 0xff);
-							data[dataIndex++] = (byte) ((ledsOnPort * 3) & 0xff);
-							data[dataIndex++] = (byte) (((ledsOnPort * 3) >> 8) & 0xff);
+						i_x++;
+
+						// iterate y-coordinates i_x (up)
+						for (int i_y = screenList.get(screenListIndex).getY()[i_x] - 1; i_y >= 0; i_y--) {
+
+							setPixel(i_x, i_y, screenList.get(screenListIndex)
+									.getImage(), data, dataIndex);
+							dataIndex += 3;
+							ledCounter++;
+
+							// open new port if required
+							if (ledCounter >= LEDS_ON_PORT) {
+
+								channel += 2048;
+								ledCounter = 0;
+
+								data[dataIndex++] = (byte) (channel & 0xff);
+								data[dataIndex++] = (byte) ((channel >> 8) & 0xff);
+								data[dataIndex++] = (byte) ((LEDS_ON_PORT * 3) & 0xff);
+								data[dataIndex++] = (byte) (((LEDS_ON_PORT * 3) >> 8) & 0xff);
+							}
 						}
 					}
-					i_x++;
 
-					for (int i_y = screenList.get(screenListIndex).getY()[i_x]-1; i_y >= 0; i_y--) {
-
-						setPixel(i_x, i_y, screenList.get(screenListIndex)
-								.getImage(), data, dataIndex);
-						dataIndex += 3;
-						ledCounter++;
-
-						//System.out.println("LEDCOUNTER UP:"+ledCounter);
-
-
-						if (ledCounter >= ledsOnPort) {
-
-							//newPort(data, dataIndex);
-
-							channel += 2048;
-							ledCounter = 0;
-
-							data[dataIndex++] = (byte) (channel & 0xff);
-							data[dataIndex++] = (byte) ((channel >> 8) & 0xff);
-							data[dataIndex++] = (byte) ((ledsOnPort * 3) & 0xff);
-							data[dataIndex++] = (byte) (((ledsOnPort * 3) >> 8) & 0xff);
+					// padding bytes for remaining leds on port
+					int rest;
+					if ((rest = 96 - ledCounter) != 96) {
+						System.out.println("REMAIN: " + rest);
+						for (int i = 0; i < rest; i++) {
+							dataIndex += 3;
 						}
+
+						channel += 2048;
+						ledCounter = 0;
+
+						data[dataIndex++] = (byte) (channel & 0xff);
+						data[dataIndex++] = (byte) ((channel >> 8) & 0xff);
+						data[dataIndex++] = (byte) ((LEDS_ON_PORT * 3) & 0xff);
+						data[dataIndex++] = (byte) (((LEDS_ON_PORT * 3) >> 8) & 0xff);
 					}
-				}
 
-				//System.out.println("DATAINDEX:"+screenListIndex+" LEDCOUNTER:"+ledCounter);
-				int remain;
-				if((remain = 96-ledCounter)!=96) {
-					System.out.println("REMAIN: "+remain);
-					for(int i=0; i<remain; i++) {
-						dataIndex += 3;
-					}
-
-					//newPort(data, dataIndex);
-
-					channel += 2048;
-					ledCounter = 0;
-
-					data[dataIndex++] = (byte) (channel & 0xff);
-					data[dataIndex++] = (byte) ((channel >> 8) & 0xff);
-					data[dataIndex++] = (byte) ((ledsOnPort * 3) & 0xff);
-					data[dataIndex++] = (byte) (((ledsOnPort * 3) >> 8) & 0xff);
-				}
-								
 				}
 
 				screenListIndex++;
@@ -179,32 +168,12 @@ public class LEDWall {
 	}
 
 	void setPixel(int ix, int iy, PImage image, byte data[], int dataIndex) {
-		// if (((ix * LED_RES_Y) + iy) <= image.length) {
 		int rgb = image.get(ix, iy);
 
 		data[dataIndex + 2] = (byte) (rgb & 0xff);
 		data[dataIndex + 1] = (byte) ((rgb >> 8) & 0xff);
 		data[dataIndex] = (byte) ((rgb >> 16) & 0xff);
 
-		// System.out.println("Pixel: "+ix+" "+iy+" "+(byte) (rgb &
-		// 0xff)+" dataIndex: "+(dataIndex-14)/3);
-
-		// }
 	}
-
-	/*void newPort() {
-
-		System.out.println("NEW PORT: "+(globalPortCounter % PORTS_PR_CONTROLLER)+" "+globalPortCounter);
-
-		ledCounter = 0;
-
-		data[dataIndex++] = (byte) (channel & 0xff);
-		data[dataIndex++] = (byte) ((channel >> 8) & 0xff);
-		data[dataIndex++] = (byte) ((LEDS_ON_PORT * 3) & 0xff);
-		data[dataIndex++] = (byte) (((LEDS_ON_PORT * 3) >> 8) & 0xff);
-		channel += 2048;
-		globalPortCounter++;
-
-	}*/
 
 }

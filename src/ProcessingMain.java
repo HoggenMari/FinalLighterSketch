@@ -51,16 +51,16 @@ public class ProcessingMain extends PApplet {
 		pg.colorMode(HSB);
 
 		// LEDScreen1 initialisieren
-		ledScreen1 = new LEDScreen(14, 12, this);
-		ledScreen2 = new LEDScreen(24, 24, this);
-		ledScreen3 = new LEDScreen(32, 24, this);
+		ledScreen1 = new LEDScreen(32, 24, this);
+		ledScreen2 = new LEDScreen(32, 24, this);
+		//ledScreen3 = new LEDScreen(32, 24, this);
 
 
 		// LEDWall initialisieren
 		ledWall = new LEDWall(this);
-		ledWall.add(ledScreen1, 0);
-		ledWall.add(ledScreen2, 0);
-		ledWall.add(ledScreen3, 1);
+		ledWall.add(ledScreen1);
+		//ledWall.add(ledScreen2, 1);
+		//ledWall.add(ledScreen3, 1);
 		ledWall.init();
 
 		// LighterList initialisieren
@@ -103,7 +103,7 @@ public class ProcessingMain extends PApplet {
 		size(200, 400);
 		background(255);
 		
-		//setupCam();
+		setupCam();
 
 	}
 	
@@ -143,31 +143,31 @@ public class ProcessingMain extends PApplet {
 		background(255);
 
 		//PImage img1 = drawFirework();
-		//PImage img1 = drawFlame();
-		//PImage img2 = drawFlame();
-		//PImage img1 = drawCam();
-		PImage img1 = loadImage("/Users/mariushoggenmuller/Documents/test.png");
-		PImage img2 = loadImage("/Users/mariushoggenmuller/Documents/test2.png");
-		PImage img3 = loadImage("/Users/mariushoggenmuller/Documents/test.png");
+		//PImage img1 = drawFirework();
+		//PImage img2 = drawFirework();
+		PImage img1 = drawCam();
+		//PImage img1 = loadImage("/Users/mariushoggenmuller/Documents/test.png");
+		//PImage img2 = loadImage("/Users/mariushoggenmuller/Documents/test2.png");
+		//PImage img3 = loadImage("/Users/mariushoggenmuller/Documents/test.png");
 		//img1 = rotate(img1);
 		image(img1, 5, 5);
-		image(img2, 5, 40);
+		//image(img2, 5, 40);
 
 		// Ausgabe für LEDScreen
 		if (SCREEN) {
-			//try {
+			try {
 			img1.resize(32, 24);
-			img2.resize(32, 12);
+			//img2.resize(32, 12);
 			ledScreen1.update(img1);
-			ledScreen2.update(img2);
-			ledScreen3.update(img3);
+			//ledScreen2.update(img2);
+			//ledScreen3.update(img3);
 			ledScreen1.drawOnGui(250, 5);
-			ledScreen2.drawOnGui(250, 200);
-			ledScreen3.drawOnGui(250, 400);
+			//ledScreen2.drawOnGui(250, 200);
+			//ledScreen3.drawOnGui(250, 400);
 			ledWall.sendDMX();
-			//} catch (Exception e) {
-			//	System.out.println("Fehler");
-			//}
+			} catch (Exception e) {
+				System.out.println(e);
+			}
 		}
 		
 
