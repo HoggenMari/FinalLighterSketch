@@ -22,6 +22,7 @@ public class ProcessingMain extends PApplet {
 	static final boolean SERIAL = true;
 	static final boolean SCREEN = true;
 	static final boolean GAME = false;
+	static final boolean CAM = false;
 	static final String ARDUINO_DEVICE = "/dev/tty.usbmodem1d1211";
 
 	/*
@@ -36,7 +37,6 @@ public class ProcessingMain extends PApplet {
 	/* Output */
 	private LEDScreen ledScreen1;
 	private LEDScreen ledScreen2;
-	// private LEDScreen ledScreen3;
 	private LEDWall ledWall;
 
 	/* ArrayList */
@@ -58,7 +58,7 @@ public class ProcessingMain extends PApplet {
 
 	public void setup() {
 
-		pg = createGraphics(160, 240);
+		pg = createGraphics(640, 480);
 		pg.colorMode(HSB);
 
 		// LEDScreen1 initialisieren
@@ -69,7 +69,7 @@ public class ProcessingMain extends PApplet {
 		// LEDWall initialisieren
 		ledWall = new LEDWall(this);
 		ledWall.add(ledScreen1, 0, LEDWall.NORMAL_MODE);
-		ledWall.add(ledScreen2);
+		//ledWall.add(ledScreen2);
 		// ledWall.add(ledScreen3, 1);
 		ledWall.init();
 
@@ -85,6 +85,9 @@ public class ProcessingMain extends PApplet {
 
 		// Fire initialisieren
 		flames = new ArrayList<Flame>();
+		
+		//Skeleton initialisieren
+		setupSkeleton();
 
 		// Serial Arduino initialisieren
 		if (SERIAL) {
@@ -113,7 +116,10 @@ public class ProcessingMain extends PApplet {
 		size(200, 400);
 		background(255);
 
+		//Cam
+		if(CAM) {
 		setupCam();
+		}
 
 	}
 
@@ -152,8 +158,9 @@ public class ProcessingMain extends PApplet {
 
 		background(255);
 
-		PImage img1 = drawFirework();
-		PImage img2 = drawFirework();
+		//PImage img1 = drawFirework();
+		//PImage img2 = drawFirework();
+		PImage img1 = drawBlur();
 		// PImage img2 = drawFirework();
 		// PImage img1 = drawCam();
 		// PImage img1 =
@@ -172,10 +179,10 @@ public class ProcessingMain extends PApplet {
 				img1.resize(16, 24);
 				// img2.resize(32, 12);
 				ledScreen1.update(img1);
-				ledScreen2.update(img2);
+				//ledScreen2.update(img2);
 				// ledScreen3.update(img3);
 				ledScreen1.drawOnGui(250, 5);
-				ledScreen2.drawOnGui(250, 200);
+				//ledScreen2.drawOnGui(250, 200);
 				// ledScreen3.drawOnGui(250, 400);
 				ledWall.sendDMX();
 			} catch (Exception e) {
@@ -309,6 +316,10 @@ public class ProcessingMain extends PApplet {
 	 * KINECT
 	 */
 	public void setupSkeleton() {
+		
+		userList = new ArrayList<Integer>();
+		cpList = new ArrayList<ColorPoint>();
+		
 		context = new SimpleOpenNI(this);
 
 		// enable Depth
@@ -338,10 +349,10 @@ public class ProcessingMain extends PApplet {
 		for (ColorPoint cp : cpList) {
 			cp.draw(pg);
 		}
-		blur(20, pg);
+		blur(10, pg);
 		PImage BlurImg = pg.get();
 		BlurImg = getReversePImage(BlurImg);
-		BlurImg.resize(160, 120);
+		BlurImg.resize(160, 240);
 		image(BlurImg, 5, 5);
 
 		return BlurImg;
@@ -525,8 +536,8 @@ public class ProcessingMain extends PApplet {
 	// Auxiliary function for Blur-Effect
 	void blur(float trans, PGraphics pg) {
 		pg.noStroke();
-		pg.fill(60, trans);
-		pg.rect(0, 0, width, height);
+		pg.fill(0, trans);
+		pg.rect(0, 0, pg.width, pg.height);
 	}
 
 	// Auxiliary function for reverse image

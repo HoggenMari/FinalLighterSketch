@@ -55,6 +55,7 @@ public class LEDScreen {
 		for (int ix = 0; ix < y.length; ix = ix + 1) {
 			for (int iy = 0; iy < y[ix]; iy = iy + 1) {
 				int rgb = image.get(ix, iy);
+				p.stroke(0);
 				p.fill(rgb);
 				p.rect(ix * 8 + pos_x, iy * 8 + pos_y, 8, 8);
 				// System.out.println("Pixel: "+ix+"x"+iy+" "+rgb);
