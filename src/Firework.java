@@ -91,8 +91,9 @@ public class Firework {
 		pg.beginDraw();
 		pg.noStroke();
 		pg.colorMode(PConstants.HSB);
-		pg.fill(0,0,0);
-		pg.rect(0, 0, p.width, p.height);
+		//pg.background(0,0,0,0);
+		//pg.fill(0,0,0);
+		//pg.rect(0, 0, p.width, p.height);
 
 		//paint tail
 		if (y > pos.y) {

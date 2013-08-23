@@ -36,7 +36,6 @@ public class ProcessingMain extends PApplet {
 
 	/* Output */
 	private LEDScreen ledScreen1;
-	private LEDScreen ledScreen2;
 	private LEDWall ledWall;
 
 	/* ArrayList */
@@ -58,19 +57,15 @@ public class ProcessingMain extends PApplet {
 
 	public void setup() {
 
-		pg = createGraphics(640, 480);
+		pg = createGraphics(160, 240, JAVA2D);
 		pg.colorMode(HSB);
 
 		// LEDScreen1 initialisieren
 		ledScreen1 = new LEDScreen(16, 24, this);
-		ledScreen2 = new LEDScreen(8, 24, this);
-		// ledScreen3 = new LEDScreen(32, 24, this);
 
 		// LEDWall initialisieren
 		ledWall = new LEDWall(this);
 		ledWall.add(ledScreen1, 0, LEDWall.NORMAL_MODE);
-		//ledWall.add(ledScreen2);
-		// ledWall.add(ledScreen3, 1);
 		ledWall.init();
 
 		// LighterList initialisieren
@@ -87,8 +82,9 @@ public class ProcessingMain extends PApplet {
 		flames = new ArrayList<Flame>();
 		
 		//Skeleton initialisieren
-		setupSkeleton();
-
+		//setupSkeleton();
+		//setupScene();
+		
 		// Serial Arduino initialisieren
 		if (SERIAL) {
 
@@ -158,9 +154,10 @@ public class ProcessingMain extends PApplet {
 
 		background(255);
 
-		//PImage img1 = drawFirework();
-		//PImage img2 = drawFirework();
-		PImage img1 = drawBlur();
+		PImage img1 = drawFirework();
+		//PImage img1 = drawFlame();
+		//PImage img1 = drawBlur();
+		//PImage img1 = drawScene();
 		// PImage img2 = drawFirework();
 		// PImage img1 = drawCam();
 		// PImage img1 =
@@ -177,6 +174,7 @@ public class ProcessingMain extends PApplet {
 		if (SCREEN) {
 			try {
 				img1.resize(16, 24);
+				image(img1, 0, 0);
 				// img2.resize(32, 12);
 				ledScreen1.update(img1);
 				//ledScreen2.update(img2);
@@ -235,6 +233,10 @@ public class ProcessingMain extends PApplet {
 			if (fw.isDead()) {
 				fireItr.remove();
 			} else
+				pg.beginDraw();
+				PImage imgbg = loadImage("/Users/mariushoggenmuller/Documents/bg_small_black.png");
+				pg.set(0,0,imgbg);
+				pg.endDraw();
 				fw.draw();
 		}
 
@@ -253,7 +255,7 @@ public class ProcessingMain extends PApplet {
 	 */
 	public PImage drawFlame() {
 
-		PImage bg = drawCam();
+		PImage bg = new PImage();;
 
 		// Lighter Flame
 		for (Lighter lg : lighterList) {
@@ -341,7 +343,7 @@ public class ProcessingMain extends PApplet {
 		for (i = 1; i <= 10; i++) {
 			// check if the skeleton is being tracked
 			if (context.isTrackingSkeleton(i)) {
-				drawSkeleton(i); // draw the skeleton
+				//drawSkeleton(i); // draw the skeleton
 			}
 		}
 
@@ -353,7 +355,6 @@ public class ProcessingMain extends PApplet {
 		PImage BlurImg = pg.get();
 		BlurImg = getReversePImage(BlurImg);
 		BlurImg.resize(160, 240);
-		image(BlurImg, 5, 5);
 
 		return BlurImg;
 
@@ -384,8 +385,8 @@ public class ProcessingMain extends PApplet {
 
 	}
 
-	// draw the skeleton with the selected joints
 	void drawSkeleton(int userId) {
+		// draw the skeleton with the selected joints
 		context.drawLimb(userId, SimpleOpenNI.SKEL_HEAD, SimpleOpenNI.SKEL_NECK);
 
 		context.drawLimb(userId, SimpleOpenNI.SKEL_NECK,
@@ -422,6 +423,29 @@ public class ProcessingMain extends PApplet {
 				SimpleOpenNI.SKEL_RIGHT_FOOT);
 	}
 
+	public void setupScene() {
+		context = new SimpleOpenNI(this);
+
+		// enable Scene
+		if (context.enableScene() == false) {
+			println("Can't open the sceneMap, maybe the camera is not connected!");
+			exit();
+			return;
+		}
+
+	}
+	
+	public PImage drawScene() {
+		System.out.println("SceneDraw");
+		context.update();
+		image(context.sceneImage(), 0, 0);
+		PImage SceneImg = context.sceneImage();
+		SceneImg = getReversePImage(SceneImg);
+		SceneImg.resize(160, 120);
+		image(SceneImg, 5, 5);
+		return SceneImg;
+	}
+	
 	/*
 	 * SIMPLE OPEN NI EVENTS
 	 */
