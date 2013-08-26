@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import processing.core.PApplet;
+import processing.core.PConstants;
 import processing.core.PGraphics;
 import processing.core.PImage;
 import processing.core.PVector;
@@ -68,10 +69,12 @@ public class Flame {
 
 		pg.beginDraw();
 		pg.noStroke();
+		pg.colorMode(PConstants.RGB);
+
 		//pg.background(0,0,0,0);
 		//pg.fill(0, 120, 120);
-		bg = p.loadImage("/Users/mariushoggenmuller/Documents/bg_small.png");
-		pg.set(0, 0, bg);
+		//bg = p.loadImage("/Users/mariushoggenmuller/Documents/bg_small.png");
+		//pg.set(0, 0, bg);
 		//pg.rect(0, 0, p.width, p.height);
 
 		for (Iterator<FlameParticle> flamePartItr = flameParticles.iterator(); flamePartItr

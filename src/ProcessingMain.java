@@ -23,6 +23,8 @@ public class ProcessingMain extends PApplet {
 	static final boolean SCREEN = true;
 	static final boolean GAME = false;
 	static final boolean CAM = false;
+	static final boolean MOVIE = true;
+	static final boolean KINECT = false;
 	static final String ARDUINO_DEVICE = "/dev/tty.usbmodem1d1211";
 
 	/*
@@ -55,6 +57,10 @@ public class ProcessingMain extends PApplet {
 	private SimpleOpenNI context;
 	boolean autoCalib = true;
 
+	private Movie m;
+
+	boolean freeze = false;
+
 	public void setup() {
 
 		pg = createGraphics(160, 240, JAVA2D);
@@ -80,11 +86,13 @@ public class ProcessingMain extends PApplet {
 
 		// Fire initialisieren
 		flames = new ArrayList<Flame>();
-		
-		//Skeleton initialisieren
-		//setupSkeleton();
-		//setupScene();
-		
+
+		// Skeleton initialisieren
+		if (KINECT) {
+			setupSkeleton();
+			setupScene();
+		}
+
 		// Serial Arduino initialisieren
 		if (SERIAL) {
 
@@ -112,9 +120,17 @@ public class ProcessingMain extends PApplet {
 		size(200, 400);
 		background(255);
 
-		//Cam
-		if(CAM) {
-		setupCam();
+		// Cam
+		if (CAM) {
+			setupCam();
+		}
+
+		// Movie
+		if (MOVIE) {
+			m = new Movie(
+					this,
+					"/Users/mariushoggenmuller/Downloads/2013 WTC Drone Military Plane Attack Proof (MUST SEE) New Witnesses.mp4");
+			m.play();
 		}
 
 	}
@@ -136,56 +152,82 @@ public class ProcessingMain extends PApplet {
 
 			// The camera can be initialized directly using an
 			// element from the array returned by list():
-			cam = new Capture(this, cameras[0]);
+			cam = new Capture(this, cameras[3]);
 			cam.start();
 		}
 	}
 
 	public PImage drawCam() {
 		PImage img = new PImage();
-		if (cam.available() == true) {
-			cam.read();
+		try {
+			if (cam.available() == true) {
+				cam.read();
+			}
+
+			img = cam.get();
+		} catch (Exception e) {
+			System.out.println("Fehler");
 		}
-		img = cam.get();
 		return img;
 	}
 
 	public void draw() {
 
-		background(255);
+		if (!freeze) {
+			background(255);
 
-		PImage img1 = drawFirework();
-		//PImage img1 = drawFlame();
-		//PImage img1 = drawBlur();
-		//PImage img1 = drawScene();
-		// PImage img2 = drawFirework();
-		// PImage img1 = drawCam();
-		// PImage img1 =
-		// loadImage("/Users/mariushoggenmuller/Documents/test.png");
-		// PImage img2 =
-		// loadImage("/Users/mariushoggenmuller/Documents/test2.png");
-		// PImage img3 =
-		// loadImage("/Users/mariushoggenmuller/Documents/test.png");
-		// img1 = rotate(img1);
-		image(img1, 5, 5);
-		// image(img2, 5, 40);
+			pg.beginDraw();
+			PImage imbg = new PImage();
+			// PImage imgbg =
+			// loadImage("/Users/mariushoggenmuller/Documents/bg_small_black.png");
+			// imbg = drawCam();
+			imbg = m.get();
+			pg.set(0, 0, imbg);
+			pg.endDraw();
 
-		// Ausgabe für LEDScreen
-		if (SCREEN) {
-			try {
-				img1.resize(16, 24);
-				image(img1, 0, 0);
-				// img2.resize(32, 12);
-				ledScreen1.update(img1);
-				//ledScreen2.update(img2);
-				// ledScreen3.update(img3);
-				ledScreen1.drawOnGui(250, 5);
-				//ledScreen2.drawOnGui(250, 200);
-				// ledScreen3.drawOnGui(250, 400);
-				ledWall.sendDMX();
-			} catch (Exception e) {
-				System.out.println(e);
+			// drawFirework();
+			// pg.set(0,0,imgbg);
+			// drawFlame();
+			drawFirework();
+			drawFlame();
+
+			// pg.set(0,0,imgbg);
+
+			// PImage img1 = drawFlame();
+			// PImage img1 = drawBlur();
+			// PImage img1 = drawScene();
+			// PImage img2 = drawFirework();
+			// PImage img1 = drawCam();
+			// PImage img1 =
+			// loadImage("/Users/mariushoggenmuller/Documents/test.png");
+			// PImage img2 =
+			// loadImage("/Users/mariushoggenmuller/Documents/test2.png");
+			// PImage img3 =
+			// loadImage("/Users/mariushoggenmuller/Documents/test.png");
+			// img1 = rotate(img1);
+			PImage img1 = pg.get();
+			image(img1, 5, 5);
+			// image(img2, 5, 40);
+
+			// Ausgabe für LEDScreen
+			if (SCREEN) {
+				try {
+					img1.resize(16, 24);
+					//image(img1, 0, 0);
+					// img2.resize(32, 12);
+					ledScreen1.update(img1);
+					// ledScreen2.update(img2);
+					// ledScreen3.update(img3);
+					ledScreen1.drawOnGui(250, 5);
+					// ledScreen2.drawOnGui(250, 200);
+					// ledScreen3.drawOnGui(250, 400);
+					ledWall.sendDMX();
+				} catch (Exception e) {
+					System.out.println(e);
+				}
 			}
+
+			//image(m, 200, 200);
 		}
 
 	}
@@ -193,7 +235,7 @@ public class ProcessingMain extends PApplet {
 	/*
 	 * FIREWORK
 	 */
-	public PImage drawFirework() {
+	public void drawFirework() {
 
 		boolean fwWithID = false;
 
@@ -233,10 +275,6 @@ public class ProcessingMain extends PApplet {
 			if (fw.isDead()) {
 				fireItr.remove();
 			} else
-				pg.beginDraw();
-				PImage imgbg = loadImage("/Users/mariushoggenmuller/Documents/bg_small_black.png");
-				pg.set(0,0,imgbg);
-				pg.endDraw();
 				fw.draw();
 		}
 
@@ -246,16 +284,16 @@ public class ProcessingMain extends PApplet {
 			game.draw();
 		}
 
-		PImage img = pg.get();
-		return img;
+		// PImage img = pg.get();
+		// return img;
 	}
 
 	/*
 	 * FLAME
 	 */
-	public PImage drawFlame() {
+	public void drawFlame() {
 
-		PImage bg = new PImage();;
+		PImage bg = new PImage();
 
 		// Lighter Flame
 		for (Lighter lg : lighterList) {
@@ -310,18 +348,18 @@ public class ProcessingMain extends PApplet {
 			fl.draw(pg, bg);
 		}
 
-		PImage img = pg.get();
-		return img;
+		// PImage img = pg.get();
+		// return img;
 	}
 
 	/*
 	 * KINECT
 	 */
 	public void setupSkeleton() {
-		
+
 		userList = new ArrayList<Integer>();
 		cpList = new ArrayList<ColorPoint>();
-		
+
 		context = new SimpleOpenNI(this);
 
 		// enable Depth
@@ -343,7 +381,7 @@ public class ProcessingMain extends PApplet {
 		for (i = 1; i <= 10; i++) {
 			// check if the skeleton is being tracked
 			if (context.isTrackingSkeleton(i)) {
-				//drawSkeleton(i); // draw the skeleton
+				// drawSkeleton(i); // draw the skeleton
 			}
 		}
 
@@ -434,7 +472,7 @@ public class ProcessingMain extends PApplet {
 		}
 
 	}
-	
+
 	public PImage drawScene() {
 		System.out.println("SceneDraw");
 		context.update();
@@ -445,7 +483,7 @@ public class ProcessingMain extends PApplet {
 		image(SceneImg, 5, 5);
 		return SceneImg;
 	}
-	
+
 	/*
 	 * SIMPLE OPEN NI EVENTS
 	 */
@@ -575,4 +613,16 @@ public class ProcessingMain extends PApplet {
 		return reverse;
 	}
 
+	// Called every time a new frame is available to read
+	public void movieEvent(Movie m) {
+		System.out.println("bla");
+		m.read();
+	}
+
+	public void keyPressed() {
+		if (key == ' ') {
+			System.out.println("Space");
+			freeze = !freeze;
+		}
+	}
 }
