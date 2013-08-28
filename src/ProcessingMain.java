@@ -1,6 +1,12 @@
 import java.awt.Color;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import controlP5.CheckBox;
+import controlP5.ControlEvent;
+import controlP5.ControlP5;
+import controlP5.DropdownList;
 
 import SimpleOpenNI.SimpleOpenNI;
 
@@ -30,6 +36,14 @@ public class ProcessingMain extends PApplet {
 	/*
 	 * Parameter Settings End
 	 */
+
+	/* GUI */
+	ControlP5 cp5;
+	CheckBox checkbox;
+	DropdownList d1;
+	
+	File f = new File("../Videos");
+	File[] fileArray = f.listFiles();
 
 	/* Serial */
 	static int lf = 10; // Linefeed in ASCII
@@ -63,11 +77,13 @@ public class ProcessingMain extends PApplet {
 
 	public void setup() {
 
-		pg = createGraphics(160, 240, JAVA2D);
+		cp5setup();
+		
+		pg = createGraphics(240, 240, JAVA2D);
 		pg.colorMode(HSB);
 
 		// LEDScreen1 initialisieren
-		ledScreen1 = new LEDScreen(16, 24, this);
+		ledScreen1 = new LEDScreen(24, 24, this);
 
 		// LEDWall initialisieren
 		ledWall = new LEDWall(this);
@@ -117,7 +133,7 @@ public class ProcessingMain extends PApplet {
 		}
 
 		// GUI
-		size(200, 400);
+		size(460, 270);
 		background(255);
 
 		// Cam
@@ -129,12 +145,45 @@ public class ProcessingMain extends PApplet {
 		if (MOVIE) {
 			m = new Movie(
 					this,
-					"/Users/mariushoggenmuller/Downloads/2013 WTC Drone Military Plane Attack Proof (MUST SEE) New Witnesses.mp4");
-			m.play();
+					"/Users/mariushoggenmuller/Downloads/LazyLoop1.avi");
+			m.loop();
 		}
 
 	}
 
+	@SuppressWarnings("deprecation")
+	public void cp5setup() {
+				
+		cp5 = new ControlP5(this);
+		  checkbox = cp5.addCheckBox("checkBox")
+		                .setPosition(5, 5)
+		                .setColorForeground(color(120))
+		                .setColorActive(color(200))
+		                .setColorLabel(color(0))
+		                .setSize(15, 15)
+		                .setItemsPerRow(6)
+		                .setSpacingColumn(45)
+		                .setSpacingRow(20)
+		                .addItem("Firework", 0)
+		                .addItem("Flame", 50)
+		                .addItem("Painting", 100)
+		                .addItem("Webcam", 150)
+		                .addItem("Image", 200)
+		                .addItem("Video", 255)
+		                ;
+		  d1 = cp5.addDropdownList("myList-d1")
+		          .setPosition(370, 21)
+		          .setSize(70, 100)
+		          .setBarHeight(15)
+		          ;
+		  
+		  d1.getCaptionLabel().style().setMarginTop(3);
+		  
+		  for (int i=0;i<fileArray.length;i++) {
+			    d1.addItem(fileArray[i].getName().toString(), i);
+			  }
+	}
+	
 	/*
 	 * CAM
 	 */
@@ -173,6 +222,7 @@ public class ProcessingMain extends PApplet {
 
 	public void draw() {
 
+		//println(checkbox.getArrayValue(0));
 		if (!freeze) {
 			background(255);
 
@@ -206,19 +256,19 @@ public class ProcessingMain extends PApplet {
 			// loadImage("/Users/mariushoggenmuller/Documents/test.png");
 			// img1 = rotate(img1);
 			PImage img1 = pg.get();
-			image(img1, 5, 5);
+			image(img1, 5, 25);
 			// image(img2, 5, 40);
 
 			// Ausgabe fŸr LEDScreen
 			if (SCREEN) {
 				try {
-					img1.resize(16, 24);
+					img1.resize(24, 24);
 					//image(img1, 0, 0);
 					// img2.resize(32, 12);
 					ledScreen1.update(img1);
 					// ledScreen2.update(img2);
 					// ledScreen3.update(img3);
-					ledScreen1.drawOnGui(250, 5);
+					ledScreen1.drawOnGui(250, 25);
 					// ledScreen2.drawOnGui(250, 200);
 					// ledScreen3.drawOnGui(250, 400);
 					ledWall.sendDMX();
@@ -551,14 +601,15 @@ public class ProcessingMain extends PApplet {
 	}
 
 	public void mousePressed() {
-
+		
+		if(mouseX < pg.width+5 && mouseY > 25) {
 		firework.add(new Firework(this, pg, new PVector(mouseX, mouseY),
 				new Color((int) random(0, 255), 255, 255), new Color(
 						(int) random(0, 255), 255, 255), 100));
 
 		mouseFlame.update(new PVector(mouseX, mouseY));
 		flames.add(mouseFlame);
-
+		}
 	}
 
 	// Arduino LighterProtocoll: "posX,posY"-items split with ',' - tuples split
@@ -615,7 +666,6 @@ public class ProcessingMain extends PApplet {
 
 	// Called every time a new frame is available to read
 	public void movieEvent(Movie m) {
-		System.out.println("bla");
 		m.read();
 	}
 
@@ -624,5 +674,17 @@ public class ProcessingMain extends PApplet {
 			System.out.println("Space");
 			freeze = !freeze;
 		}
+	}
+	
+	public void controlEvent(ControlEvent theEvent) {
+		if (theEvent.isGroup()) {
+		    // check if the Event was triggered from a ControlGroup
+		    println("event from group : "+theEvent.getGroup().getValue()+" from "+theEvent.getGroup());
+		    
+		    int file = (int) theEvent.getGroup().getValue();
+		    m = new Movie(this, fileArray[file].toString());
+		    m.loop();
+		  } 
+		
 	}
 }

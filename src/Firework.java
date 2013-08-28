@@ -5,7 +5,6 @@ import java.util.Iterator;
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PGraphics;
-import processing.core.PImage;
 import processing.core.PVector;
 
 public class Firework {
