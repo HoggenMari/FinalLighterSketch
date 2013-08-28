@@ -40,11 +40,14 @@ public class ProcessingMain extends PApplet {
 	/* GUI */
 	ControlP5 cp5;
 	CheckBox checkbox;
-	DropdownList d1;
+	DropdownList d1, d2;
 	
-	File f = new File("../Videos");
-	File[] fileArray = f.listFiles();
+	File videoFolder = new File("../Videos");
+	File[] videoFiles = videoFolder.listFiles();
 
+	File imageFolder = new File("../Images");
+	File[] imageFiles = imageFolder.listFiles();
+	
 	/* Serial */
 	static int lf = 10; // Linefeed in ASCII
 	String myString = null; // Serial Output String
@@ -74,6 +77,10 @@ public class ProcessingMain extends PApplet {
 	private Movie m;
 
 	boolean freeze = false;
+
+	private PImage imbg;
+
+	private PImage img;
 
 	public void setup() {
 
@@ -133,7 +140,7 @@ public class ProcessingMain extends PApplet {
 		}
 
 		// GUI
-		size(460, 270);
+		size(530, 270);
 		background(255);
 
 		// Cam
@@ -148,6 +155,8 @@ public class ProcessingMain extends PApplet {
 					"/Users/mariushoggenmuller/Downloads/LazyLoop1.avi");
 			m.loop();
 		}
+		
+		img = loadImage("../Images/bg_small.png");
 
 	}
 
@@ -171,7 +180,7 @@ public class ProcessingMain extends PApplet {
 		                .addItem("Image", 200)
 		                .addItem("Video", 255)
 		                ;
-		  d1 = cp5.addDropdownList("myList-d1")
+		  d1 = cp5.addDropdownList("Videos")
 		          .setPosition(370, 21)
 		          .setSize(70, 100)
 		          .setBarHeight(15)
@@ -179,8 +188,20 @@ public class ProcessingMain extends PApplet {
 		  
 		  d1.getCaptionLabel().style().setMarginTop(3);
 		  
-		  for (int i=0;i<fileArray.length;i++) {
-			    d1.addItem(fileArray[i].getName().toString(), i);
+		  for (int i=0;i<videoFiles.length;i++) {
+			    d1.addItem(videoFiles[i].getName().toString(), i);
+			  }
+		  
+		  d2 = cp5.addDropdownList("Images")
+		          .setPosition(450, 21)
+		          .setSize(70, 100)
+		          .setBarHeight(15)
+		          ;
+		  
+		  d2.getCaptionLabel().style().setMarginTop(3);
+		  
+		  for (int i=0;i<imageFiles.length;i++) {
+			    d2.addItem(imageFiles[i].getName().toString(), i);
 			  }
 	}
 	
@@ -227,19 +248,32 @@ public class ProcessingMain extends PApplet {
 			background(255);
 
 			pg.beginDraw();
-			PImage imbg = new PImage();
+			imbg = new PImage();
 			// PImage imgbg =
 			// loadImage("/Users/mariushoggenmuller/Documents/bg_small_black.png");
 			// imbg = drawCam();
+			if(checkbox.getArrayValue(5) == 1.0) {
+			pg.background(0);
 			imbg = m.get();
 			pg.set(0, 0, imbg);
+			} else if(checkbox.getArrayValue(4) == 1.0) {
+			pg.background(0);
+			imbg = img.get();
+			pg.set(0, 0, imbg);
+			} else {
+			pg.background(0);
+			}
 			pg.endDraw();
 
 			// drawFirework();
 			// pg.set(0,0,imgbg);
 			// drawFlame();
+			if(checkbox.getArrayValue(0) == 1.0) {
 			drawFirework();
+			}
+			if(checkbox.getArrayValue(1) == 1.0) {
 			drawFlame();
+			}
 
 			// pg.set(0,0,imgbg);
 
@@ -677,14 +711,20 @@ public class ProcessingMain extends PApplet {
 	}
 	
 	public void controlEvent(ControlEvent theEvent) {
-		if (theEvent.isGroup()) {
+		if (theEvent.getGroup().getName() == "Videos") {
 		    // check if the Event was triggered from a ControlGroup
 		    println("event from group : "+theEvent.getGroup().getValue()+" from "+theEvent.getGroup());
 		    
 		    int file = (int) theEvent.getGroup().getValue();
-		    m = new Movie(this, fileArray[file].toString());
+		    m = new Movie(this, videoFiles[file].toString());
 		    m.loop();
-		  } 
+		} else if (theEvent.getGroup().getName() == "Images") {
+			// check if the Event was triggered from a ControlGroup
+		    println("event from group : "+theEvent.getGroup().getValue()+" from "+theEvent.getGroup());
+		    
+		    int file = (int) theEvent.getGroup().getValue();
+			img = loadImage(imageFiles[file].toString());
+		}
 		
 	}
 }
