@@ -41,13 +41,13 @@ public class ProcessingMain extends PApplet {
 	ControlP5 cp5;
 	CheckBox checkbox;
 	DropdownList d1, d2;
-	
+
 	File videoFolder = new File("../Videos");
 	File[] videoFiles = videoFolder.listFiles();
 
 	File imageFolder = new File("../Images");
 	File[] imageFiles = imageFolder.listFiles();
-	
+
 	/* Serial */
 	static int lf = 10; // Linefeed in ASCII
 	String myString = null; // Serial Output String
@@ -85,7 +85,7 @@ public class ProcessingMain extends PApplet {
 	public void setup() {
 
 		cp5setup();
-		
+
 		pg = createGraphics(240, 240, JAVA2D);
 		pg.colorMode(HSB);
 
@@ -109,6 +109,10 @@ public class ProcessingMain extends PApplet {
 
 		// Fire initialisieren
 		flames = new ArrayList<Flame>();
+		
+		// Paint initialisieren
+		userList = new ArrayList<Integer>();
+		cpList = new ArrayList<ColorPoint>();
 
 		// Skeleton initialisieren
 		if (KINECT) {
@@ -150,61 +154,46 @@ public class ProcessingMain extends PApplet {
 
 		// Movie
 		if (MOVIE) {
-			m = new Movie(
-					this,
+			m = new Movie(this,
 					"/Users/mariushoggenmuller/Downloads/LazyLoop1.avi");
 			m.loop();
 		}
-		
+
 		img = loadImage("../Images/bg_small.png");
 
 	}
 
 	@SuppressWarnings("deprecation")
 	public void cp5setup() {
-				
+
 		cp5 = new ControlP5(this);
-		  checkbox = cp5.addCheckBox("checkBox")
-		                .setPosition(5, 5)
-		                .setColorForeground(color(120))
-		                .setColorActive(color(200))
-		                .setColorLabel(color(0))
-		                .setSize(15, 15)
-		                .setItemsPerRow(6)
-		                .setSpacingColumn(45)
-		                .setSpacingRow(20)
-		                .addItem("Firework", 0)
-		                .addItem("Flame", 50)
-		                .addItem("Painting", 100)
-		                .addItem("Webcam", 150)
-		                .addItem("Image", 200)
-		                .addItem("Video", 255)
-		                ;
-		  d1 = cp5.addDropdownList("Videos")
-		          .setPosition(370, 21)
-		          .setSize(70, 100)
-		          .setBarHeight(15)
-		          ;
-		  
-		  d1.getCaptionLabel().style().setMarginTop(3);
-		  
-		  for (int i=0;i<videoFiles.length;i++) {
-			    d1.addItem(videoFiles[i].getName().toString(), i);
-			  }
-		  
-		  d2 = cp5.addDropdownList("Images")
-		          .setPosition(450, 21)
-		          .setSize(70, 100)
-		          .setBarHeight(15)
-		          ;
-		  
-		  d2.getCaptionLabel().style().setMarginTop(3);
-		  
-		  for (int i=0;i<imageFiles.length;i++) {
-			    d2.addItem(imageFiles[i].getName().toString(), i);
-			  }
+		checkbox = cp5.addCheckBox("checkBox").setPosition(5, 5)
+				.setColorForeground(color(120)).setColorActive(color(200))
+				.setColorLabel(color(0)).setSize(15, 15).setItemsPerRow(6)
+				.setSpacingColumn(45).setSpacingRow(20).addItem("Firework", 0)
+				.addItem("Flame", 50).addItem("Painting", 100)
+				.addItem("Webcam", 150).addItem("Image", 200)
+				.addItem("Video", 255);
+		
+		d1 = cp5.addDropdownList("Videos").setPosition(370, 21)
+				.setSize(70, 100).setBarHeight(15);
+
+		d1.getCaptionLabel().style().setMarginTop(3);
+
+		for (int i = 0; i < videoFiles.length; i++) {
+			d1.addItem(videoFiles[i].getName().toString(), i);
+		}
+
+		d2 = cp5.addDropdownList("Images").setPosition(450, 21)
+				.setSize(70, 100).setBarHeight(15);
+
+		d2.getCaptionLabel().style().setMarginTop(3);
+
+		for (int i = 0; i < imageFiles.length; i++) {
+			d2.addItem(imageFiles[i].getName().toString(), i);
+		}
 	}
-	
+
 	/*
 	 * CAM
 	 */
@@ -237,13 +226,14 @@ public class ProcessingMain extends PApplet {
 			img = cam.get();
 		} catch (Exception e) {
 			System.out.println("Fehler");
+			setupCam();
 		}
 		return img;
 	}
 
 	public void draw() {
 
-		//println(checkbox.getArrayValue(0));
+		// println(checkbox.getArrayValue(0));
 		if (!freeze) {
 			background(255);
 
@@ -252,29 +242,34 @@ public class ProcessingMain extends PApplet {
 			// PImage imgbg =
 			// loadImage("/Users/mariushoggenmuller/Documents/bg_small_black.png");
 			// imbg = drawCam();
-			if(checkbox.getArrayValue(5) == 1.0) {
-			pg.background(0);
-			imbg = m.get();
-			pg.set(0, 0, imbg);
-			} else if(checkbox.getArrayValue(4) == 1.0) {
-			pg.background(0);
-			imbg = img.get();
-			pg.set(0, 0, imbg);
+			if (checkbox.getArrayValue(5) == 1.0) {
+				pg.background(0);
+				imbg = m.get();
+				pg.set(0, 0, imbg);
+			} else if (checkbox.getArrayValue(4) == 1.0) {
+				pg.background(0);
+				imbg = img.get();
+				pg.set(0, 0, imbg);
+			} else if (checkbox.getArrayValue(3) == 1.0) {
+				imbg = drawCam();
+				pg.set(0, 0, imbg);
 			} else {
-			pg.background(0);
+				pg.background(0);
 			}
 			pg.endDraw();
 
 			// drawFirework();
 			// pg.set(0,0,imgbg);
 			// drawFlame();
-			if(checkbox.getArrayValue(0) == 1.0) {
-			drawFirework();
+			if (checkbox.getArrayValue(0) == 1.0) {
+				drawFirework();
 			}
-			if(checkbox.getArrayValue(1) == 1.0) {
-			drawFlame();
+			if (checkbox.getArrayValue(1) == 1.0) {
+				drawFlame();
 			}
-
+			if (checkbox.getArrayValue(2) == 1.0) {
+				drawBlur();
+			}
 			// pg.set(0,0,imgbg);
 
 			// PImage img1 = drawFlame();
@@ -297,7 +292,7 @@ public class ProcessingMain extends PApplet {
 			if (SCREEN) {
 				try {
 					img1.resize(24, 24);
-					//image(img1, 0, 0);
+					// image(img1, 0, 0);
 					// img2.resize(32, 12);
 					ledScreen1.update(img1);
 					// ledScreen2.update(img2);
@@ -311,7 +306,7 @@ public class ProcessingMain extends PApplet {
 				}
 			}
 
-			//image(m, 200, 200);
+			// image(m, 200, 200);
 		}
 
 	}
@@ -441,9 +436,6 @@ public class ProcessingMain extends PApplet {
 	 */
 	public void setupSkeleton() {
 
-		userList = new ArrayList<Integer>();
-		cpList = new ArrayList<ColorPoint>();
-
 		context = new SimpleOpenNI(this);
 
 		// enable Depth
@@ -453,7 +445,7 @@ public class ProcessingMain extends PApplet {
 		context.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
 	}
 
-	public PImage drawBlur() {
+	public void drawBlur() {
 		context.update();
 		image(context.depthImage(), 0, 0);
 
@@ -468,17 +460,15 @@ public class ProcessingMain extends PApplet {
 				// drawSkeleton(i); // draw the skeleton
 			}
 		}
-
+		
 		setPoint();
 		for (ColorPoint cp : cpList) {
 			cp.draw(pg);
 		}
 		blur(10, pg);
-		PImage BlurImg = pg.get();
+		/*PImage BlurImg = pg.get();
 		BlurImg = getReversePImage(BlurImg);
-		BlurImg.resize(160, 240);
-
-		return BlurImg;
+		BlurImg.resize(160, 240);*/
 
 	}
 
@@ -635,14 +625,16 @@ public class ProcessingMain extends PApplet {
 	}
 
 	public void mousePressed() {
-		
-		if(mouseX < pg.width+5 && mouseY > 25) {
-		firework.add(new Firework(this, pg, new PVector(mouseX, mouseY),
-				new Color((int) random(0, 255), 255, 255), new Color(
-						(int) random(0, 255), 255, 255), 100));
 
-		mouseFlame.update(new PVector(mouseX, mouseY));
-		flames.add(mouseFlame);
+		if (mouseX < pg.width + 5 && mouseY > 25) {
+			firework.add(new Firework(this, pg, new PVector(mouseX, mouseY),
+					new Color((int) random(0, 255), 255, 255), new Color(
+							(int) random(0, 255), 255, 255), 100));
+
+			mouseFlame.update(new PVector(mouseX, mouseY));
+			flames.add(mouseFlame);
+			cpList.add(new ColorPoint(this, 1000));
+
 		}
 	}
 
@@ -709,22 +701,24 @@ public class ProcessingMain extends PApplet {
 			freeze = !freeze;
 		}
 	}
-	
+
 	public void controlEvent(ControlEvent theEvent) {
 		if (theEvent.getGroup().getName() == "Videos") {
-		    // check if the Event was triggered from a ControlGroup
-		    println("event from group : "+theEvent.getGroup().getValue()+" from "+theEvent.getGroup());
-		    
-		    int file = (int) theEvent.getGroup().getValue();
-		    m = new Movie(this, videoFiles[file].toString());
-		    m.loop();
+			// check if the Event was triggered from a ControlGroup
+			println("event from group : " + theEvent.getGroup().getValue()
+					+ " from " + theEvent.getGroup());
+
+			int file = (int) theEvent.getGroup().getValue();
+			m = new Movie(this, videoFiles[file].toString());
+			m.loop();
 		} else if (theEvent.getGroup().getName() == "Images") {
 			// check if the Event was triggered from a ControlGroup
-		    println("event from group : "+theEvent.getGroup().getValue()+" from "+theEvent.getGroup());
-		    
-		    int file = (int) theEvent.getGroup().getValue();
+			println("event from group : " + theEvent.getGroup().getValue()
+					+ " from " + theEvent.getGroup());
+
+			int file = (int) theEvent.getGroup().getValue();
 			img = loadImage(imageFiles[file].toString());
 		}
-		
+
 	}
 }
