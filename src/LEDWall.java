@@ -61,16 +61,16 @@ public class LEDWall {
 	
 	
 	
-	public byte[] sendHelper(int pr, int ch, int ix_start) {
-		byte[] payload = new byte[3000];
+	public byte[] sendHelper(int ch, byte[]...data) {
+		byte[] payload = new byte[1500];
+		
+		System.out.println("Aufruf");
 
 		
 		payload[0] = 'Y';
 		payload[1] = 'T';
 		payload[2] = 'K';
 		payload[3] = 'J';
-
-		int i_x = ix_start;
 
 		for (int controller = 1; controller <= NUMBER_OF_CONTROLLERS; controller++) {
 			payload[4] = (byte) (controller);
@@ -89,9 +89,12 @@ public class LEDWall {
 			payload[9] = 0;
 
 			int payloadIndex = 10;
-
+			
 			// Now map the pixels
-			for (int port = pr, channel = ch; port < pr+2; port++, channel += 2048) {
+			for (int port = 0, channel = ch; port < data.length; port++, channel += 2048) {
+				
+				System.out.println("DataLength: "+data[port].length+" "+data.length);
+				
 				payload[payloadIndex++] = (byte) (channel & 0xff);
 				payload[payloadIndex++] = (byte) ((channel >> 8) & 0xff);
 
@@ -99,28 +102,11 @@ public class LEDWall {
 				payload[payloadIndex++] = (byte) ((ledsOnPort * 3) & 0xff);
 				payload[payloadIndex++] = (byte) (((ledsOnPort * 3) >> 8) & 0xff);
 
-				//for(int i=0; i<2; i++) {
-				
-					
-					// iterate x-coordinates
-					for (; i_x < 8*(port+1); i_x++) {
-						
-						// iterate y-coordinates i_x (down)
-						for (int i_y = 0; i_y < screenList.get(0)
-								.getY()[i_x]; i_y++) {
-							setPixel(i_x, i_y, screenList.get(0).getImage(), payload, payloadIndex);
-							payloadIndex += 3;
-							
-						}
-						
-						i_x++;
-						
-						// iterate y-coordinates i_x (up)
-						for (int i_y = screenList.get(0).getY()[i_x] - 1; i_y >= 0; i_y--) {
-							setPixel(i_x, i_y, screenList.get(0).getImage(), payload, payloadIndex);
-							payloadIndex += 3;
-						}
-		
+				for(int i=0; i<data[port].length; i++) {
+				if((i%10)==0) {
+					//System.out.println("Schreiben: "+data[port][i]+" in payloadIndex: "+payloadIndex);
+				}
+				payload[payloadIndex++] = data[port][i];
 				}
 			}
 		}
@@ -132,13 +118,13 @@ public class LEDWall {
 	public void sendDMX() {
 		
 				
-		
-		byte[] data = new byte[3000];
-
+	
 
 		//System.out.println(headCounter);
 		
 		ArrayList <byte[]> packetList = new ArrayList<byte[]>();
+		int plIndex = 0;
+
 
 		
 		//kleine Datenpackete
@@ -148,10 +134,8 @@ public class LEDWall {
 			
 			packetList.add(new byte[576]);
 			System.out.println("PacketListSize: "+packetList.size());
-			int plIndex = 0;
 			int packetIndex = 0;
 			int count = 0;
-			int countAll = 0;
 
 			
 				// solange genug freie LEDs pro Port
@@ -159,17 +143,17 @@ public class LEDWall {
 						.getY().length; ix++) {
 
 					for (int iy = 0; iy < screenList.get(screenIndex).getY()[ix]; iy++) {
-						setPixel(ix, iy, screenList.get(0).getImage(), packetList.get(plIndex),
+						setPixel(ix, iy, screenList.get(screenIndex).getImage(), packetList.get(plIndex),
 								packetIndex);
 						packetIndex += 3;
 						count++;
-						countAll++;
-						System.out.println("Count "+count+" ix " + ix);
+						//System.out.println("Count "+count+" ix " + ix);
 						
+						//System.out.println(screenList.get(screenIndex).getImage().get(ix, iy));
 						// wenn grš§er als DatenPacket
 						if (count >= 192 && (iy<screenList.get(screenIndex).getY()[ix] || ix+1<screenList.get(screenIndex).getY().length)) {
 							packetList.add(new byte[576]);
-							System.out.println("Increase auf: "+packetList.size()+" iy: "+iy+" ix "+ix);
+							//System.out.println("Increase auf: "+packetList.size()+" iy: "+iy+" ix "+ix);
 							plIndex++;
 							count = 0;
 							packetIndex = 0;
@@ -178,17 +162,16 @@ public class LEDWall {
 					}
 					ix++;
 					for (int iy = screenList.get(screenIndex).getY()[ix] - 1; iy >= 0; iy--) {
-						setPixel(ix, iy, screenList.get(0).getImage(), packetList.get(plIndex),
+						setPixel(ix, iy, screenList.get(screenIndex).getImage(), packetList.get(plIndex),
 								packetIndex);
 						packetIndex += 3;
 						count++;
-						countAll++;
-						System.out.println("Count "+count + " ix " + ix);
+						//System.out.println("Count "+count + " ix " + ix);
 						
 						// wenn grš§er als DatenPacket
 						if (count >= 192 && (iy>0 || ix+1<screenList.get(screenIndex).getY().length)) {
 							packetList.add(new byte[576]);
-							System.out.println("Increase auf: "+packetList.size()+" iy: "+iy+" ix "+ix+" length: "+screenList.get(screenIndex).getY().length);
+							//System.out.println("Increase auf: "+packetList.size()+" iy: "+iy+" ix "+ix+" length: "+screenList.get(screenIndex).getY().length);
 							plIndex++;
 							count = 0;
 							packetIndex = 0;
@@ -196,6 +179,8 @@ public class LEDWall {
 					}
 					
 				}
+				
+				plIndex++;
 				
 				/*packetList.add(new byte[576]);
 				plIndex++;
@@ -206,11 +191,28 @@ public class LEDWall {
 		
 		System.out.println("Packete: "+packetList.size());
 
+		/*for(int j=0; j<576; j++) {
+		  System.out.println(packetList.get(3)[j]);
+		}*/
+		
+		for(int i=0; i<packetList.size(); i+=2) {
+			byte[] dataSend = sendHelper(i*2048, packetList.get(i), packetList.get(i+1));
+			
+			System.out.println("AUFRUF: "+i);
+			
+			for(int j=0; j<dataSend.length; j++) {
+				System.out.println("DataIndex: "+j+"Data: "+dataSend[j]);
+			}
+			
+			/*for(int j=0; j<576; j++) {
+				System.out.println(packetList.get(0)[i]);
+			}*/
+			
+			udp.send(dataSend, ip, port);
+		}
 		//for(int i=0; i<0; i++) {
 			//data = sendHelper(0, 0, 0);
-			/*for(int j=0; j<data.length; j++) {
-				System.out.println("DataIndex: "+j+"Data: "+data[j]);
-			}*/
+			
 			//udp.send(data, ip, port);
 			
 			
@@ -406,7 +408,7 @@ public class LEDWall {
 	void setPixel(int ix, int iy, PImage image, byte data[], int dataIndex) {
 		int rgb = image.get(ix, iy);
 		
-		//System.out.println("Setze Pixel:" +ix+" "+iy+" "+dataIndex);
+		//System.out.println("Setze Pixel:" +ix+" "+iy+" "+rgb);
 
 		data[dataIndex + 2] = (byte) (rgb & 0xff);
 		data[dataIndex + 1] = (byte) ((rgb >> 8) & 0xff);
