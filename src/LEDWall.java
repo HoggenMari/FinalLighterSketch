@@ -131,7 +131,6 @@ public class LEDWall {
 	
 	public void sendDMX() {
 		
-		int screenIndex = 0;
 				
 		
 		byte[] data = new byte[3000];
@@ -139,18 +138,84 @@ public class LEDWall {
 
 		//System.out.println(headCounter);
 		
+		ArrayList <byte[]> packetList = new ArrayList<byte[]>();
+
 		
+		//kleine Datenpackete
+		for(int screenIndex=0; screenIndex<screenList.size(); screenIndex++) {
+			
+			System.out.println("ScreenListIndex: "+screenIndex);
+			
+			packetList.add(new byte[576]);
+			System.out.println("PacketListSize: "+packetList.size());
+			int plIndex = 0;
+			int packetIndex = 0;
+			int count = 0;
+			int countAll = 0;
+
+			
+				// solange genug freie LEDs pro Port
+				for (int ix = 0; ix < screenList.get(screenIndex)
+						.getY().length; ix++) {
+
+					for (int iy = 0; iy < screenList.get(screenIndex).getY()[ix]; iy++) {
+						setPixel(ix, iy, screenList.get(0).getImage(), packetList.get(plIndex),
+								packetIndex);
+						packetIndex += 3;
+						count++;
+						countAll++;
+						System.out.println("Count "+count+" ix " + ix);
+						
+						// wenn grš§er als DatenPacket
+						if (count >= 192 && (iy<screenList.get(screenIndex).getY()[ix] || ix+1<screenList.get(screenIndex).getY().length)) {
+							packetList.add(new byte[576]);
+							System.out.println("Increase auf: "+packetList.size()+" iy: "+iy+" ix "+ix);
+							plIndex++;
+							count = 0;
+							packetIndex = 0;
+						}
+						
+					}
+					ix++;
+					for (int iy = screenList.get(screenIndex).getY()[ix] - 1; iy >= 0; iy--) {
+						setPixel(ix, iy, screenList.get(0).getImage(), packetList.get(plIndex),
+								packetIndex);
+						packetIndex += 3;
+						count++;
+						countAll++;
+						System.out.println("Count "+count + " ix " + ix);
+						
+						// wenn grš§er als DatenPacket
+						if (count >= 192 && (iy>0 || ix+1<screenList.get(screenIndex).getY().length)) {
+							packetList.add(new byte[576]);
+							System.out.println("Increase auf: "+packetList.size()+" iy: "+iy+" ix "+ix+" length: "+screenList.get(screenIndex).getY().length);
+							plIndex++;
+							count = 0;
+							packetIndex = 0;
+						}
+					}
+					
+				}
+				
+				/*packetList.add(new byte[576]);
+				plIndex++;
+				count = 0;
+				packetIndex = 0;*/
+				
+		}
+		
+		System.out.println("Packete: "+packetList.size());
 
 		//for(int i=0; i<0; i++) {
-			data = sendHelper(0, 0, 0);
+			//data = sendHelper(0, 0, 0);
 			/*for(int j=0; j<data.length; j++) {
 				System.out.println("DataIndex: "+j+"Data: "+data[j]);
 			}*/
-			udp.send(data, ip, port);
+			//udp.send(data, ip, port);
 			
 			
-			data = sendHelper(2, 4096, 16);
-			udp.send(data, ip, port);
+			//data = sendHelper(2, 4096, 16);
+			//udp.send(data, ip, port);
 			
 			//data = sendHelper(4, 8192, 32);
 			//udp.send(data, ip, port);

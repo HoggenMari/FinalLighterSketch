@@ -30,7 +30,7 @@ public class ProcessingMain extends PApplet {
 	static final boolean GAME = false;
 	static final boolean CAM = false;
 	static final boolean MOVIE = true;
-	static final boolean KINECT = true;
+	static final boolean KINECT = false;
 	static final String ARDUINO_DEVICE = "/dev/tty.usbmodem1d1211";
 
 	/*
@@ -82,6 +82,8 @@ public class ProcessingMain extends PApplet {
 
 	private PImage img;
 
+	private LEDScreen ledScreen2;
+
 	public void setup() {
 		
 		//frameRate(25);
@@ -92,11 +94,14 @@ public class ProcessingMain extends PApplet {
 		pg.colorMode(HSB);
 
 		// LEDScreen1 initialisieren
-		ledScreen1 = new LEDScreen(64, 24, this);
+		ledScreen1 = new LEDScreen(24, 24, this);
+		ledScreen2 = new LEDScreen(48, 12, this);
+
 
 		// LEDWall initialisieren
 		ledWall = new LEDWall(this);
 		ledWall.add(ledScreen1, 0, LEDWall.NORMAL_MODE);
+		ledWall.add(ledScreen2, 0, LEDWall.NORMAL_MODE);
 		ledWall.init();
 
 		// LighterList initialisieren
@@ -295,13 +300,14 @@ public class ProcessingMain extends PApplet {
 			// Ausgabe für LEDScreen
 			if (SCREEN) {
 				//try {
-					img1.resize(32, 24);
+					img1.resize(24, 24);
 					// image(img1, 0, 0);
 					// img2.resize(32, 12);
 					ledScreen1.update(img1);
-					// ledScreen2.update(img2);
+					ledScreen2.update(img1);
 					// ledScreen3.update(img3);
 					ledScreen1.drawOnGui(250, 25);
+					ledScreen2.drawOnGui(250, 250);
 					// ledScreen2.drawOnGui(250, 200);
 					// ledScreen3.drawOnGui(250, 400);
 					if((frameCount%2)==0) {
