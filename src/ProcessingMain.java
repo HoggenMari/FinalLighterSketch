@@ -30,7 +30,7 @@ public class ProcessingMain extends PApplet {
 	static final boolean GAME = false;
 	static final boolean CAM = false;
 	static final boolean MOVIE = true;
-	static final boolean KINECT = false;
+	static final boolean KINECT = true;
 	static final String ARDUINO_DEVICE = "/dev/tty.usbmodem1d1211";
 
 	/*
@@ -83,14 +83,16 @@ public class ProcessingMain extends PApplet {
 	private PImage img;
 
 	public void setup() {
+		
+		//frameRate(25);
 
 		cp5setup();
-
+		
 		pg = createGraphics(240, 240, JAVA2D);
 		pg.colorMode(HSB);
 
 		// LEDScreen1 initialisieren
-		ledScreen1 = new LEDScreen(24, 24, this);
+		ledScreen1 = new LEDScreen(64, 24, this);
 
 		// LEDWall initialisieren
 		ledWall = new LEDWall(this);
@@ -117,7 +119,7 @@ public class ProcessingMain extends PApplet {
 		// Skeleton initialisieren
 		if (KINECT) {
 			setupSkeleton();
-			setupScene();
+			//setupScene();
 		}
 
 		// Serial Arduino initialisieren
@@ -290,8 +292,8 @@ public class ProcessingMain extends PApplet {
 
 			// Ausgabe für LEDScreen
 			if (SCREEN) {
-				try {
-					img1.resize(24, 24);
+				//try {
+					img1.resize(32, 24);
 					// image(img1, 0, 0);
 					// img2.resize(32, 12);
 					ledScreen1.update(img1);
@@ -300,10 +302,12 @@ public class ProcessingMain extends PApplet {
 					ledScreen1.drawOnGui(250, 25);
 					// ledScreen2.drawOnGui(250, 200);
 					// ledScreen3.drawOnGui(250, 400);
-					ledWall.sendDMX();
-				} catch (Exception e) {
-					System.out.println(e);
-				}
+					if((frameCount%2)==0) {
+						ledWall.sendDMX();
+					}
+				//} catch (Exception e) {
+					//System.out.println(e);
+				//}
 			}
 
 			// image(m, 200, 200);
@@ -457,7 +461,7 @@ public class ProcessingMain extends PApplet {
 		for (i = 1; i <= 10; i++) {
 			// check if the skeleton is being tracked
 			if (context.isTrackingSkeleton(i)) {
-				// drawSkeleton(i); // draw the skeleton
+				 drawSkeleton(i); // draw the skeleton
 			}
 		}
 		
@@ -465,10 +469,11 @@ public class ProcessingMain extends PApplet {
 		for (ColorPoint cp : cpList) {
 			cp.draw(pg);
 		}
-		blur(10, pg);
-		/*PImage BlurImg = pg.get();
-		BlurImg = getReversePImage(BlurImg);
-		BlurImg.resize(160, 240);*/
+		blur(20, pg);
+		//PImage BlurImg = pg.get();
+		//BlurImg = getReversePImage(BlurImg);
+		//BlurImg.resize(160, 240);
+		//image(BlurImg, 0,0);
 
 	}
 
@@ -484,6 +489,9 @@ public class ProcessingMain extends PApplet {
 							SimpleOpenNI.SKEL_LEFT_HAND, jointPosLeft);
 					context.convertRealWorldToProjective(jointPosLeft,
 							posProjLeft);
+					
+					System.out.println("SET_POINT: "+posProjLeft.x+" "+posProjLeft.y);
+
 
 					for (ColorPoint cp : cpList) {
 						if (cp.equals(user)) {

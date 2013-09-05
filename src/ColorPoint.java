@@ -33,7 +33,7 @@ public void setPoint(float posX, float posY)
 	pg.colorMode(PConstants.HSB);
     pg.beginDraw();
     pg.stroke( p.frameCount % 256, 255, 255);
-    pg.strokeWeight(200);
+    pg.strokeWeight(50);
     pg.line(posX, posY, posX, posY);
     pg.endDraw();
   }
