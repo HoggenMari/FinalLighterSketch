@@ -244,6 +244,7 @@ public class ProcessingMain extends PApplet {
 			// PImage imgbg =
 			// loadImage("/Users/mariushoggenmuller/Documents/bg_small_black.png");
 			// imbg = drawCam();
+			if(checkbox.getArrayValue(2)==0) {
 			if (checkbox.getArrayValue(5) == 1.0) {
 				pg.background(0);
 				imbg = m.get();
@@ -257,6 +258,7 @@ public class ProcessingMain extends PApplet {
 				pg.set(0, 0, imbg);
 			} else {
 				pg.background(0);
+			}
 			}
 			pg.endDraw();
 
@@ -464,16 +466,15 @@ public class ProcessingMain extends PApplet {
 				 drawSkeleton(i); // draw the skeleton
 			}
 		}
-		
+		blur(20, pg);
 		setPoint();
 		for (ColorPoint cp : cpList) {
 			cp.draw(pg);
 		}
-		blur(20, pg);
-		//PImage BlurImg = pg.get();
-		//BlurImg = getReversePImage(BlurImg);
-		//BlurImg.resize(160, 240);
-		//image(BlurImg, 0,0);
+		PImage BlurImg = pg.get();
+		BlurImg = getReversePImage(BlurImg);
+		BlurImg.resize(160, 240);
+		image(BlurImg, 0,300);
 
 	}
 
