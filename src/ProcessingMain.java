@@ -84,6 +84,8 @@ public class ProcessingMain extends PApplet {
 
 	private LEDScreen ledScreen2;
 
+	private PGraphics pg2;
+
 	public void setup() {
 		
 		//frameRate(25);
@@ -91,6 +93,12 @@ public class ProcessingMain extends PApplet {
 		cp5setup();
 		
 		pg = createGraphics(240, 240, JAVA2D);
+		pg2 = createGraphics(240, 240, JAVA2D);
+		
+		pg2.beginDraw();
+		pg2.background(0);
+		pg2.endDraw();
+
 		pg.colorMode(HSB);
 
 		// LEDScreen1 initialisieren
@@ -239,6 +247,8 @@ public class ProcessingMain extends PApplet {
 	}
 
 	public void draw() {
+		
+		System.out.println(Color.BLACK.getRGB());
 
 		// println(checkbox.getArrayValue(0));
 		if (!freeze) {
@@ -255,9 +265,22 @@ public class ProcessingMain extends PApplet {
 				imbg = m.get();
 				pg.set(0, 0, imbg);
 			} else if (checkbox.getArrayValue(4) == 1.0) {
-				pg.background(0);
+				//pg.background(0);
 				imbg = img.get();
-				pg.set(0, 0, imbg);
+				for(int i=0; i<pg2.width; i++) {
+					for(int j=0; j<pg2.height; j++) {
+						int rgb = pg2.get(i, j);
+						byte r = (byte) (rgb & 0xff);
+						byte g = (byte) ((rgb >> 8) & 0xff);
+						byte b = (byte) ((rgb >> 16) & 0xff);
+						if(r<50 && g<50 && b<50) {
+						pg.set(i, j, imbg.get(i, j));
+						}
+						/*if((frameCount%10)==0) {
+							System.out.println("i: "+i+"j: "+j+" "+pg2.get(i, j));
+						}*/
+					}
+				}
 			} else if (checkbox.getArrayValue(3) == 1.0) {
 				imbg = drawCam();
 				pg.set(0, 0, imbg);
@@ -473,17 +496,19 @@ public class ProcessingMain extends PApplet {
 			}
 		}
 		blur(10, pg);
+		blur(5, pg2);
 		setPoint();
 		for (ColorPoint cp : cpList) {
 			cp.draw(pg);
+			cp.draw(pg2);
 		}
 		//pg = reversePGraphics(pg);
 		//pg = reversePGraphics(pg);
 
-		/*PImage BlurImg = pg.get();
-		BlurImg = getReversePImage(BlurImg);
+		PImage BlurImg = pg2.get();
+		//BlurImg = getReversePImage(BlurImg);
 		BlurImg.resize(160, 240);
-		image(BlurImg, 0,300);*/
+		image(BlurImg, 0,300);
 
 	}
 
