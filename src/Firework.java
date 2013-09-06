@@ -73,7 +73,7 @@ public class Firework {
 			float R = p.random(0, 2);
 
 			hanabi.add(new FireworkParticle(pg, pos.x, pos.y, R * PApplet.sin(r), R
-					* PApplet.cos(r), c1, lifetime, p.random(4, 4)));
+					* PApplet.cos(r), c1, lifetime, p.random(6, 8)));
 		}
 		
 		for (int i=0; i < 100; i++) {
@@ -81,7 +81,7 @@ public class Firework {
 			float R = p.random(4, 8);
 
 			hanabi.add(new FireworkParticle(pg, pos.x, pos.y, R * PApplet.sin(r), R
-					* PApplet.cos(r), c2, lifetime, p.random(4, 8)));
+					* PApplet.cos(r), c2, lifetime, p.random(6, 10)));
 		}
 
 	}

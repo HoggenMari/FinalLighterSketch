@@ -30,7 +30,7 @@ public class ProcessingMain extends PApplet {
 	static final boolean GAME = false;
 	static final boolean CAM = false;
 	static final boolean MOVIE = true;
-	static final boolean KINECT = false;
+	static final boolean KINECT = true;
 	static final String ARDUINO_DEVICE = "/dev/tty.usbmodem1d1211";
 
 	/*
@@ -95,7 +95,7 @@ public class ProcessingMain extends PApplet {
 
 		// LEDScreen1 initialisieren
 		ledScreen1 = new LEDScreen(24, 24, this);
-		ledScreen2 = new LEDScreen(24, 8, this);
+		ledScreen2 = new LEDScreen(8, 24, this);
 
 
 		// LEDWall initialisieren
@@ -249,7 +249,7 @@ public class ProcessingMain extends PApplet {
 			// PImage imgbg =
 			// loadImage("/Users/mariushoggenmuller/Documents/bg_small_black.png");
 			// imbg = drawCam();
-			if(checkbox.getArrayValue(2)==0) {
+			//if(checkbox.getArrayValue(2)==0) {
 			if (checkbox.getArrayValue(5) == 1.0) {
 				pg.background(0);
 				imbg = m.get();
@@ -264,7 +264,7 @@ public class ProcessingMain extends PApplet {
 			} else {
 				pg.background(0);
 			}
-			}
+			//}
 			pg.endDraw();
 
 			// drawFirework();
@@ -472,15 +472,18 @@ public class ProcessingMain extends PApplet {
 				 drawSkeleton(i); // draw the skeleton
 			}
 		}
-		blur(20, pg);
+		blur(10, pg);
 		setPoint();
 		for (ColorPoint cp : cpList) {
 			cp.draw(pg);
 		}
-		PImage BlurImg = pg.get();
+		//pg = reversePGraphics(pg);
+		//pg = reversePGraphics(pg);
+
+		/*PImage BlurImg = pg.get();
 		BlurImg = getReversePImage(BlurImg);
 		BlurImg.resize(160, 240);
-		image(BlurImg, 0,300);
+		image(BlurImg, 0,300);*/
 
 	}
 
@@ -704,6 +707,18 @@ public class ProcessingMain extends PApplet {
 		}
 		return reverse;
 	}
+	
+	//Auxiliary function for reverse PGrahic
+	public PGraphics reversePGraphics(PGraphics pg) {
+		PGraphics reverse = createGraphics(pg.width, pg.height, JAVA2D);
+		for (int i = 0; i < pg.width; i++) {
+			for (int j = 0; j < pg.height; j++) {
+				reverse.set(pg.width - 1 - i, j, pg.get(i, j));
+			}
+		}
+	    return reverse;
+		
+	}
 
 	// Called every time a new frame is available to read
 	public void movieEvent(Movie m) {
@@ -724,6 +739,7 @@ public class ProcessingMain extends PApplet {
 					+ " from " + theEvent.getGroup());
 
 			int file = (int) theEvent.getGroup().getValue();
+			m.stop();
 			m = new Movie(this, videoFiles[file].toString());
 			m.loop();
 		} else if (theEvent.getGroup().getName() == "Images") {

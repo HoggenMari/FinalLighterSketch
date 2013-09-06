@@ -25,15 +25,16 @@ public boolean equals(int userId) {
 
 public void setPoint(float posX, float posY)
   {
-    this.posX = posX;
-    this.posY = posY;
+	System.out.println("posX: "+posX+" posY: "+posY);
+    this.posX = ((640-posX)/640)*300;
+    this.posY = (posY/480)*240;
   }
   
   public void draw(PGraphics pg) {
 	pg.colorMode(PConstants.HSB);
     pg.beginDraw();
     pg.stroke( p.frameCount % 256, 255, 255);
-    pg.strokeWeight(50);
+    pg.strokeWeight(70);
     pg.line(posX, posY, posX, posY);
     pg.endDraw();
   }
