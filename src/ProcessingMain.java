@@ -103,7 +103,7 @@ public class ProcessingMain extends PApplet {
 
 		// LEDScreen1 initialisieren
 		ledScreen1 = new LEDScreen(24, 24, this);
-		ledScreen2 = new LEDScreen(8, 24, this);
+		ledScreen2 = new LEDScreen(48, 12, this);
 
 
 		// LEDWall initialisieren
@@ -265,22 +265,9 @@ public class ProcessingMain extends PApplet {
 				imbg = m.get();
 				pg.set(0, 0, imbg);
 			} else if (checkbox.getArrayValue(4) == 1.0) {
-				//pg.background(0);
+				pg.background(0);
 				imbg = img.get();
-				for(int i=0; i<pg2.width; i++) {
-					for(int j=0; j<pg2.height; j++) {
-						int rgb = pg2.get(i, j);
-						byte r = (byte) (rgb & 0xff);
-						byte g = (byte) ((rgb >> 8) & 0xff);
-						byte b = (byte) ((rgb >> 16) & 0xff);
-						if(r<50 && g<50 && b<50) {
-						pg.set(i, j, imbg.get(i, j));
-						}
-						/*if((frameCount%10)==0) {
-							System.out.println("i: "+i+"j: "+j+" "+pg2.get(i, j));
-						}*/
-					}
-				}
+				pg.set(0, 0, imbg);
 			} else if (checkbox.getArrayValue(3) == 1.0) {
 				imbg = drawCam();
 				pg.set(0, 0, imbg);
@@ -496,11 +483,11 @@ public class ProcessingMain extends PApplet {
 			}
 		}
 		blur(10, pg);
-		blur(5, pg2);
+		//blur(5, pg2);
 		setPoint();
 		for (ColorPoint cp : cpList) {
 			cp.draw(pg);
-			cp.draw(pg2);
+			//cp.draw(pg2);
 		}
 		//pg = reversePGraphics(pg);
 		//pg = reversePGraphics(pg);
