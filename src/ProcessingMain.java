@@ -92,7 +92,7 @@ public class ProcessingMain extends PApplet {
 
 		cp5setup();
 		
-		pg = createGraphics(240, 240, JAVA2D);
+		pg = createGraphics(300, 240, JAVA2D);
 		pg2 = createGraphics(240, 240, JAVA2D);
 		
 		pg2.beginDraw();
@@ -102,8 +102,8 @@ public class ProcessingMain extends PApplet {
 		pg.colorMode(HSB);
 
 		// LEDScreen1 initialisieren
-		ledScreen1 = new LEDScreen(24, 24, this);
-		ledScreen2 = new LEDScreen(48, 12, this);
+		ledScreen1 = new LEDScreen(48, 12, this);
+		ledScreen2 = new LEDScreen(24, 24, this);
 
 
 		// LEDWall initialisieren
@@ -129,8 +129,11 @@ public class ProcessingMain extends PApplet {
 		userList = new ArrayList<Integer>();
 		cpList = new ArrayList<ColorPoint>();
 
+		setupCam();
+		
 		// Skeleton initialisieren
 		if (KINECT) {
+			//setupCam();
 			setupSkeleton();
 			//setupScene();
 		}
@@ -214,6 +217,7 @@ public class ProcessingMain extends PApplet {
 	 */
 	public void setupCam() {
 		String[] cameras = Capture.list();
+		System.out.println("SETUPCAM");
 
 		if (cameras.length == 0) {
 			println("There are no cameras available for capture.");
@@ -226,7 +230,7 @@ public class ProcessingMain extends PApplet {
 
 			// The camera can be initialized directly using an
 			// element from the array returned by list():
-			cam = new Capture(this, cameras[3]);
+			cam = new Capture(this, cameras[18]);
 			cam.start();
 		}
 	}
@@ -240,8 +244,8 @@ public class ProcessingMain extends PApplet {
 
 			img = cam.get();
 		} catch (Exception e) {
-			System.out.println("Fehler");
-			setupCam();
+			//System.out.println("Fehler: "+e);
+			//setupCam();
 		}
 		return img;
 	}
@@ -265,6 +269,10 @@ public class ProcessingMain extends PApplet {
 				imbg = m.get();
 				pg.set(0, 0, imbg);
 			} else if (checkbox.getArrayValue(4) == 1.0) {
+				//cam.stop();
+				//cam.dispose();
+				//ontext.delete();
+				//context.delete();
 				pg.background(0);
 				imbg = img.get();
 				pg.set(0, 0, imbg);
@@ -303,18 +311,21 @@ public class ProcessingMain extends PApplet {
 			// PImage img3 =
 			// loadImage("/Users/mariushoggenmuller/Documents/test.png");
 			// img1 = rotate(img1);
-			PImage img1 = pg.get();
+			PImage img1 = pg.get(0, 0, pg.width, 80);
+			PImage img2 = pg.get(0, 80, pg.width, 160);
 			image(img1, 5, 25);
+			image(img2, 5, 100);
 			// image(img2, 5, 40);
 
 			// Ausgabe für LEDScreen
 			if (SCREEN) {
 				//try {
-					img1.resize(24, 24);
+					img1.resize(48, 12);
+					img2.resize(24, 24);
 					// image(img1, 0, 0);
 					// img2.resize(32, 12);
 					ledScreen1.update(img1);
-					ledScreen2.update(img1);
+					ledScreen2.update(img2);
 					// ledScreen3.update(img3);
 					ledScreen1.drawOnGui(250, 25);
 					ledScreen2.drawOnGui(250, 250);
@@ -324,7 +335,7 @@ public class ProcessingMain extends PApplet {
 						ledWall.sendDMX();
 					}
 				//} catch (Exception e) {
-					//System.out.println(e);
+				//	System.out.println("Exception: "+e);
 				//}
 			}
 
